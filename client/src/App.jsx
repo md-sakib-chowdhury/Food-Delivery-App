@@ -120,13 +120,24 @@
 
 // export default App
 import { Routes, Route } from 'react-router-dom'
+import Navbar from './components/Navbar'
+import Home from './pages/Home'
+import Menu from './pages/Menu'
+import Cart from './pages/Cart'
+import Login from './pages/Login'
+import OrderTracking from './pages/OrderTracking'
 
 function App() {
   return (
     <div className="min-h-screen bg-gray-50">
-      <h1 className="text-3xl text-center text-orange-500 py-10">
-        BanglaEats 🍔
-      </h1>
+      <Navbar />
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/menu" element={<Menu />} />
+        <Route path="/cart" element={<Cart />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/track/:id" element={<OrderTracking />} />
+      </Routes>
     </div>
   )
 }
