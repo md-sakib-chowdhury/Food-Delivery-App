@@ -128,6 +128,7 @@ import Menu from './pages/Menu'
 import Cart from './pages/Cart'
 import Login from './pages/Login'
 import OrderTracking from './pages/OrderTracking'
+import Admin from './pages/Admin'
 
 function App() {
   return (
@@ -139,6 +140,7 @@ function App() {
         <Route path="/cart" element={<Cart />} />
         <Route path="/login" element={<Login />} />
         <Route path="/track/:id" element={<OrderTracking />} />
+        <Route path="/admin" element={<Admin />} />
       </Routes>
     </div>
   )
