@@ -157,7 +157,7 @@ const Admin = () => {
 
     const loadOrders = async () => {
         try {
-            const res = await api.get('/orders/user')
+            const res = await api.get('/orders/all')
             if (res.data.success) setOrders(res.data.orders)
         } catch { }
     }
