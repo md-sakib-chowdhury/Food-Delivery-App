@@ -44,5 +44,13 @@ router.put('/:id/status', authMiddleware, async (req, res) => {
         res.json({ success: false, message: err.message })
     }
 })
+router.get('/all', authMiddleware, async (req, res) => {
+    try {
+        const orders = await Order.find().sort({ createdAt: -1 })
+        res.json({ success: true, orders })
+    } catch (err) {
+        res.json({ success: false, message: err.message })
+    }
+})
 
 export default router

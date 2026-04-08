@@ -229,8 +229,8 @@ const Admin = () => {
                             key={item.id}
                             onClick={() => setActiveTab(item.id)}
                             className={`flex items-center gap-3 px-4 py-3 rounded-xl text-left transition font-medium ${activeTab === item.id
-                                    ? 'bg-orange-500 text-white'
-                                    : 'text-gray-600 hover:bg-orange-50 hover:text-orange-500'
+                                ? 'bg-orange-500 text-white'
+                                : 'text-gray-600 hover:bg-orange-50 hover:text-orange-500'
                                 }`}
                         >
                             <span>{item.icon}</span>
@@ -473,7 +473,7 @@ const Admin = () => {
                 )}
 
                 {/* Orders Tab */}
-                {activeTab === 'orders' && (
+                {/* {activeTab === 'orders' && (
                     <div>
                         <h2 className="text-2xl font-bold text-gray-800 mb-6">সব Orders</h2>
                         <div className="bg-white rounded-2xl shadow overflow-hidden">
@@ -512,6 +512,66 @@ const Admin = () => {
                                                     <span className={`px-3 py-1 rounded-full text-xs font-medium ${statusColor[order.status] || 'bg-gray-100 text-gray-600'}`}>
                                                         {order.status}
                                                     </span>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            )}
+                        </div>
+                    </div>
+                )} */}
+
+                {activeTab === 'orders' && (
+                    <div>
+                        <h2 className="text-2xl font-bold text-gray-800 mb-6">সব Orders</h2>
+                        <div className="bg-white rounded-2xl shadow overflow-hidden">
+                            {orders.length === 0 ? (
+                                <div className="text-center py-20 text-gray-400">
+                                    <div className="text-5xl mb-4">📦</div>
+                                    <p>কোনো order নেই</p>
+                                </div>
+                            ) : (
+                                <table className="w-full text-sm">
+                                    <thead className="bg-gray-50 border-b border-gray-100">
+                                        <tr>
+                                            <th className="text-left py-4 px-6 text-gray-500 font-medium">Order ID</th>
+                                            <th className="text-left py-4 px-6 text-gray-500 font-medium">Items</th>
+                                            <th className="text-left py-4 px-6 text-gray-500 font-medium">Amount</th>
+                                            <th className="text-left py-4 px-6 text-gray-500 font-medium">Payment</th>
+                                            <th className="text-left py-4 px-6 text-gray-500 font-medium">Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {orders.map(order => (
+                                            <tr key={order._id} className="border-b border-gray-50 hover:bg-gray-50">
+                                                <td className="py-4 px-6 font-mono text-xs text-gray-400">
+                                                    #{order._id.slice(-6).toUpperCase()}
+                                                </td>
+                                                <td className="py-4 px-6 text-gray-700 max-w-xs">
+                                                    {order.items.map(i => `${i.name} x${i.quantity}`).join(', ')}
+                                                </td>
+                                                <td className="py-4 px-6 font-bold text-orange-500">৳{order.amount}</td>
+                                                <td className="py-4 px-6">
+                                                    <span className={`px-3 py-1 rounded-full text-xs font-medium ${order.payment ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-500'}`}>
+                                                        {order.payment ? 'Paid' : 'COD'}
+                                                    </span>
+                                                </td>
+                                                <td className="py-4 px-6">
+                                                    <select
+                                                        value={order.status}
+                                                        onChange={async (e) => {
+                                                            await api.put(`/orders/${order._id}/status`, { status: e.target.value })
+                                                            loadOrders()
+                                                        }}
+                                                        className="border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-orange-500"
+                                                    >
+                                                        <option>Pending</option>
+                                                        <option>Preparing</option>
+                                                        <option>On The Way</option>
+                                                        <option>Delivered</option>
+                                                        <option>Cancelled</option>
+                                                    </select>
                                                 </td>
                                             </tr>
                                         ))}
