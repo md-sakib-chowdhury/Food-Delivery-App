@@ -120,7 +120,6 @@
 
 // export default App
 
-
 import { Routes, Route } from 'react-router-dom'
 import Navbar from './components/Navbar'
 import Home from './pages/Home'
@@ -129,6 +128,7 @@ import Cart from './pages/Cart'
 import Login from './pages/Login'
 import OrderTracking from './pages/OrderTracking'
 import Admin from './pages/Admin'
+import Orders from './pages/Orders'
 
 function App() {
   return (
@@ -141,6 +141,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/track/:id" element={<OrderTracking />} />
         <Route path="/admin" element={<Admin />} />
+        <Route path="/orders" element={<Orders />} />
       </Routes>
     </div>
   )
