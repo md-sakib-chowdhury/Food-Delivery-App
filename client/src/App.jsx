@@ -126,9 +126,9 @@ import Home from './pages/Home'
 import Menu from './pages/Menu'
 import Cart from './pages/Cart'
 import Login from './pages/Login'
-import OrderTracking from './pages/OrderTracking'
+import OrderTracking from './pages/Ordertracking'
 import Admin from './pages/Admin'
-import Orders from './pages/Orders'
+import Orders from './pages/Order'
 
 function App() {
   return (
