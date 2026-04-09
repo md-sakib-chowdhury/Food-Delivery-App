@@ -82,7 +82,7 @@ const Navbar = () => {
     }
 
     return (
-        <nav className="bg-white shadow-md sticky top-0 z-50">
+        <nav className="bg-gray-200 shadow-md sticky top-0 z-50">
             <div className="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
                 <Link to="/" className="text-2xl font-bold text-orange-500">
                     🍔 BanglaEats
