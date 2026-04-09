@@ -89,6 +89,7 @@ import { useCart } from '../context/CartContext'
 import { useAuth } from '../context/AuthContext'
 import { placeOrder } from '../services/api'
 import { useNavigate } from 'react-router-dom'
+import api from '../services/api'
 
 const Cart = () => {
     const { cartItems, updateQuantity, removeFromCart, clearCart, totalAmount } = useCart()
@@ -105,6 +106,34 @@ const Cart = () => {
         transactionId: ''
     })
     const [paymentMethod, setPaymentMethod] = useState('COD')
+    const [couponCode, setCouponCode] = useState('')
+    const [coupon, setCoupon] = useState(null)
+    const [couponError, setCouponError] = useState('')
+    const [couponLoading, setCouponLoading] = useState(false)
+
+    const discountAmount = coupon ? coupon.discount : 0
+    const finalAmount = totalAmount + 50 - discountAmount
+
+    const applyCoupon = async () => {
+        if (!couponCode) return
+        setCouponLoading(true)
+        setCouponError('')
+        try {
+            const res = await api.post('/coupons/apply', {
+                code: couponCode,
+                orderAmount: totalAmount
+            })
+            if (res.data.success) {
+                setCoupon(res.data)
+            } else {
+                setCouponError(res.data.message)
+                setCoupon(null)
+            }
+        } catch {
+            setCouponError('Error হয়েছে!')
+        }
+        setCouponLoading(false)
+    }
 
     const handleOrder = async () => {
         if (!user) return navigate('/login')
@@ -122,16 +151,17 @@ const Cart = () => {
                     foodId: i._id, name: i.name,
                     price: i.price, quantity: i.quantity, image: i.image
                 })),
-                amount: totalAmount + 50,
+                amount: finalAmount,
                 address,
                 paymentMethod,
-                payment: paymentMethod !== 'COD'
+                payment: paymentMethod !== 'COD',
+                couponCode: coupon ? coupon.code : null
             })
             if (res.data.success) {
                 clearCart()
                 const orderId = res.data.order._id
                 if (paymentMethod === 'bKash') {
-                    alert(`✅ Order Confirm হয়েছে!\n\nOrder ID: #${orderId.slice(-6).toUpperCase()}\n\nতোমার bKash payment verify করা হবে এবং SMS পাবে।\n\nধন্যবাদ! 🎉`)
+                    alert(`✅ Order Confirm হয়েছে!\n\nOrder ID: #${orderId.slice(-6).toUpperCase()}\n\nতোমার bKash payment verify করা হবে।\n\nধন্যবাদ! 🎉`)
                 } else if (paymentMethod === 'COD') {
                     alert(`✅ Order Confirm হয়েছে!\n\nOrder ID: #${orderId.slice(-6).toUpperCase()}\n\nDelivery man আসলে cash দিন।\n\nধন্যবাদ! 🎉`)
                 } else {
@@ -250,15 +280,13 @@ const Cart = () => {
                                     onClick={() => setPaymentMethod(method)}
                                     className={`px-5 py-2 rounded-xl border-2 font-medium transition ${paymentMethod === method
                                         ? 'border-orange-500 bg-orange-50 text-orange-500'
-                                        : 'border-gray-200 text-gray-500'
-                                        }`}
+                                        : 'border-gray-200 text-gray-500'}`}
                                 >
                                     {method === 'COD' ? '💵 Cash on Delivery' : method === 'bKash' ? '📱 bKash' : '💳 Card'}
                                 </button>
                             ))}
                         </div>
 
-                        {/* bKash Form */}
                         {paymentMethod === 'bKash' && (
                             <div className="mt-4 bg-pink-50 border border-pink-200 rounded-xl p-4">
                                 <div className="flex items-center gap-2 mb-3">
@@ -290,13 +318,10 @@ const Cart = () => {
                                         />
                                     </div>
                                 </div>
-                                <p className="text-xs text-gray-400 mt-2">
-                                    * Send Money করার পর Transaction ID টা এখানে দিন
-                                </p>
+                                <p className="text-xs text-gray-400 mt-2">* Send Money করার পর Transaction ID দিন</p>
                             </div>
                         )}
 
-                        {/* Card Form */}
                         {paymentMethod === 'Card' && (
                             <div className="mt-4 bg-blue-50 border border-blue-200 rounded-xl p-4">
                                 <div className="flex items-center gap-2 mb-3">
@@ -304,22 +329,13 @@ const Cart = () => {
                                     <span className="font-bold text-blue-600">Card Payment</span>
                                 </div>
                                 <div className="flex flex-col gap-3">
-                                    <input
-                                        type="text"
-                                        placeholder="Card Number: XXXX XXXX XXXX XXXX"
-                                        className="w-full border border-blue-200 rounded-xl px-4 py-3 focus:outline-none focus:border-blue-400 bg-white"
-                                    />
+                                    <input type="text" placeholder="Card Number: XXXX XXXX XXXX XXXX"
+                                        className="w-full border border-blue-200 rounded-xl px-4 py-3 focus:outline-none focus:border-blue-400 bg-white" />
                                     <div className="grid grid-cols-2 gap-3">
-                                        <input
-                                            type="text"
-                                            placeholder="Expiry: MM/YY"
-                                            className="w-full border border-blue-200 rounded-xl px-4 py-3 focus:outline-none focus:border-blue-400 bg-white"
-                                        />
-                                        <input
-                                            type="text"
-                                            placeholder="CVV: XXX"
-                                            className="w-full border border-blue-200 rounded-xl px-4 py-3 focus:outline-none focus:border-blue-400 bg-white"
-                                        />
+                                        <input type="text" placeholder="Expiry: MM/YY"
+                                            className="w-full border border-blue-200 rounded-xl px-4 py-3 focus:outline-none focus:border-blue-400 bg-white" />
+                                        <input type="text" placeholder="CVV: XXX"
+                                            className="w-full border border-blue-200 rounded-xl px-4 py-3 focus:outline-none focus:border-blue-400 bg-white" />
                                     </div>
                                 </div>
                                 <p className="text-xs text-gray-400 mt-2">* Demo purposes only</p>
@@ -331,15 +347,55 @@ const Cart = () => {
 
             {/* Order Summary */}
             <div className="bg-white rounded-2xl shadow p-6">
+
+                {/* Coupon — শুধু checkout এ দেখাবে */}
+                {showAddress && (
+                    <div className="mb-4">
+                        <label className="text-sm text-gray-500 mb-2 block">🎟️ Coupon Code</label>
+                        <div className="flex gap-2">
+                            <input
+                                type="text"
+                                placeholder="Coupon code দাও"
+                                className="flex-1 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:border-orange-500 uppercase"
+                                value={couponCode}
+                                onChange={e => { setCouponCode(e.target.value.toUpperCase()); setCoupon(null); setCouponError('') }}
+                            />
+                            <button
+                                onClick={applyCoupon}
+                                disabled={couponLoading}
+                                className="bg-orange-500 text-white px-5 py-3 rounded-xl font-bold hover:bg-orange-600 disabled:opacity-50"
+                            >
+                                {couponLoading ? '...' : 'Apply'}
+                            </button>
+                        </div>
+                        {coupon && (
+                            <div className="mt-2 bg-green-50 border border-green-200 text-green-700 px-4 py-2 rounded-xl text-sm">
+                                ✅ "{coupon.code}" applied! ৳{coupon.discount} discount পেয়েছো!
+                            </div>
+                        )}
+                        {couponError && (
+                            <div className="mt-2 bg-red-50 border border-red-200 text-red-600 px-4 py-2 rounded-xl text-sm">
+                                ❌ {couponError}
+                            </div>
+                        )}
+                    </div>
+                )}
+
                 <div className="flex justify-between mb-2 text-gray-600">
                     <span>Subtotal</span><span>৳{totalAmount}</span>
                 </div>
                 <div className="flex justify-between mb-2 text-gray-600">
                     <span>Delivery Fee</span><span>৳50</span>
                 </div>
+                {coupon && (
+                    <div className="flex justify-between mb-2 text-green-600">
+                        <span>Discount ({coupon.code})</span>
+                        <span>-৳{discountAmount}</span>
+                    </div>
+                )}
                 <div className="flex justify-between font-bold text-lg border-t pt-3 mt-3">
                     <span>Total</span>
-                    <span className="text-orange-500">৳{totalAmount + 50}</span>
+                    <span className="text-orange-500">৳{finalAmount}</span>
                 </div>
 
                 {!showAddress ? (
