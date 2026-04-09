@@ -126,9 +126,10 @@ import Home from './pages/Home'
 import Menu from './pages/Menu'
 import Cart from './pages/Cart'
 import Login from './pages/Login'
-import OrderTracking from './pages/Ordertracking'
+import OrderTracking from './pages/OrderTracking'
 import Admin from './pages/Admin'
-import Orders from './pages/Order'
+import Orders from './pages/Orders'
+import Profile from './pages/Profile'
 
 function App() {
   return (
@@ -142,6 +143,7 @@ function App() {
         <Route path="/track/:id" element={<OrderTracking />} />
         <Route path="/admin" element={<Admin />} />
         <Route path="/orders" element={<Orders />} />
+        <Route path="/profile" element={<Profile />} />
       </Routes>
     </div>
   )
