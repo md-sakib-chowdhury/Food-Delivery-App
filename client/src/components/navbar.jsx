@@ -109,7 +109,9 @@ const Navbar = () => {
 
                     {user ? (
                         <div className="flex items-center gap-3">
-                            <span className="text-gray-600 text-sm">Hi, {user.name}</span>
+                            <Link to="/profile" className="text-gray-600 text-sm hover:text-orange-500 font-medium">
+                                👤 {user.name}
+                            </Link>
                             {user.role === 'admin' && (
                                 <Link to="/admin" className="text-purple-600 hover:text-purple-800 text-sm font-medium">
                                     Admin
