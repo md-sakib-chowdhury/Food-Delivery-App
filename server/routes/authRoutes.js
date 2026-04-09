@@ -2,7 +2,7 @@ import express from 'express'
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 import User from '../models/User.js'
-
+import authMiddleware from '../middleware/authMiddleware.js'
 const router = express.Router()
 
 router.post('/register', async (req, res) => {
@@ -33,6 +33,20 @@ router.post('/login', async (req, res) => {
 
         const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '7d' })
         res.json({ success: true, token, user: { name: user.name, email: user.email, role: user.role } })
+    } catch (err) {
+        res.json({ success: false, message: err.message })
+    }
+})
+
+router.put('/profile', authMiddleware, async (req, res) => {
+    try {
+        const { name, phone, address } = req.body
+        const user = await User.findByIdAndUpdate(
+            req.userId,
+            { name, phone, address },
+            { new: true }
+        )
+        res.json({ success: true, user: { name: user.name, email: user.email, role: user.role, phone: user.phone, address: user.address } })
     } catch (err) {
         res.json({ success: false, message: err.message })
     }
