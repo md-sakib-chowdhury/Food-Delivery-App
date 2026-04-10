@@ -14,5 +14,6 @@ export const getFoods = () => api.get('/food')
 export const placeOrder = (data) => api.post('/orders/place', data)
 export const getMyOrders = () => api.get('/orders/user')
 export const getOrderById = (id) => api.get(`/orders/${id}`)
+export const getActiveCoupons = () => api.get('/coupons/active')
 
 export default api
