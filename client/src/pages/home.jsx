@@ -628,21 +628,82 @@ const Home = () => {
             {/* ── Why BanglaEats ── */}
             <div style={{ background: '#FFF8F3' }} className="py-16 px-4">
                 <div className="max-w-6xl mx-auto">
-                    <h2 className="text-2xl font-bold text-gray-800 text-center mb-10">কেন BanglaEats?</h2>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
+                    {/* Header */}
+                    <div className="text-center mb-12">
+                        <span
+                            className="inline-block text-xs font-semibold px-4 py-1 rounded-full mb-3 uppercase tracking-widest"
+                            style={{ background: '#FFF0E5', color: '#FF5C00' }}
+                        >
+                            আমাদের সুবিধা
+                        </span>
+                        <h2 className="text-3xl font-bold text-gray-900 mb-2">কেন BanglaEats বেছে নেবে?</h2>
+                        <p className="text-gray-400 text-sm">Dhaka-তে সবচেয়ে ভালো food delivery experience আমরাই দিই</p>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
                         {[
-                            { icon: '⚡', title: 'দ্রুত ডেলিভারি', desc: 'মাত্র ৩০ মিনিটে আপনার দরজায় পৌঁছে যাবে' },
-                            { icon: '🍽️', title: 'সেরা মান', desc: 'সেরা রেস্টুরেন্ট থেকে তাজা ও সুস্বাদু খাবার' },
-                            { icon: '💳', title: 'সহজ পেমেন্ট', desc: 'bKash, Card বা Cash on Delivery — যেকোনো উপায়ে' },
+                            {
+                                icon: '⚡',
+                                title: 'দ্রুত ডেলিভারি',
+                                desc: 'মাত্র ৩০ মিনিটে আপনার দরজায় পৌঁছে যাবে — দেরি নেই, অপেক্ষা নেই।',
+                                tag: '⏱ ৩০ min গ্যারান্টি',
+                                accent: '#FF5C00',
+                                iconBg: '#FFF0E5',
+                                tagBg: '#FFF0E5',
+                                tagColor: '#FF5C00',
+                            },
+                            {
+                                icon: '🍽️',
+                                title: 'সেরা মান',
+                                desc: 'সেরা রেস্টুরেন্ট থেকে তাজা ও সুস্বাদু খাবার — প্রতিটি order এ quality নিশ্চিত।',
+                                tag: '✓ Quality নিশ্চিত',
+                                accent: '#1D9E75',
+                                iconBg: '#E1F5EE',
+                                tagBg: '#E1F5EE',
+                                tagColor: '#0F6E56',
+                            },
+                            {
+                                icon: '💳',
+                                title: 'সহজ পেমেন্ট',
+                                desc: 'bKash, Card বা Cash on Delivery — যেকোনো উপায়ে সহজে pay করো।',
+                                tag: '🔒 Secure Payment',
+                                accent: '#7F77DD',
+                                iconBg: '#EEEDFE',
+                                tagBg: '#EEEDFE',
+                                tagColor: '#534AB7',
+                            },
                         ].map(f => (
                             <div
                                 key={f.title}
-                                className="bg-white rounded-2xl p-8 shadow-sm"
+                                className="bg-white rounded-3xl p-8 relative overflow-hidden text-left"
                                 style={{ border: '0.5px solid #f0e0d6' }}
                             >
-                                <div className="text-5xl mb-4">{f.icon}</div>
-                                <h3 className="text-lg font-bold text-gray-800 mb-2">{f.title}</h3>
-                                <p className="text-gray-400">{f.desc}</p>
+                                {/* Top accent bar */}
+                                <div
+                                    className="absolute top-0 left-0 right-0 h-1 rounded-t-3xl"
+                                    style={{ background: f.accent }}
+                                />
+                                {/* Corner blob */}
+                                <div
+                                    className="absolute bottom-0 right-0 w-20 h-20 rounded-full opacity-10 -mb-6 -mr-6"
+                                    style={{ background: f.accent }}
+                                />
+                                {/* Icon */}
+                                <div
+                                    className="flex items-center justify-center mb-5"
+                                    style={{ width: 64, height: 64, borderRadius: 18, background: f.iconBg, fontSize: 30 }}
+                                >
+                                    {f.icon}
+                                </div>
+                                <h3 className="text-lg font-bold text-gray-900 mb-2">{f.title}</h3>
+                                <p className="text-gray-400 text-sm leading-relaxed mb-5">{f.desc}</p>
+                                {/* Tag */}
+                                <span
+                                    className="inline-block text-xs font-semibold px-3 py-1 rounded-full"
+                                    style={{ background: f.tagBg, color: f.tagColor }}
+                                >
+                                    {f.tag}
+                                </span>
                             </div>
                         ))}
                     </div>
