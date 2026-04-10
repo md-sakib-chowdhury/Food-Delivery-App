@@ -44,5 +44,12 @@ router.get('/all', authMiddleware, async (req, res) => {
         res.json({ success: false, message: err.message })
     }
 })
-
+router.get('/active', async (req, res) => {
+    try {
+        const coupons = await Coupon.find({ active: true }).select('code discount type minOrder')
+        res.json({ success: true, coupons })
+    } catch (err) {
+        res.json({ success: false, message: err.message })
+    }
+})
 export default router
