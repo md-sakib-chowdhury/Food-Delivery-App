@@ -1,6 +1,49 @@
 import { useState, useEffect } from 'react'
-import { getFoods } from '../services/api'
+import { getFoods, getActiveCoupons } from '../services/api'
 import { useCart } from '../context/CartContext'
+
+const OfferBanner = () => {
+    const [coupons, setCoupons] = useState([])
+    const [current, setCurrent] = useState(0)
+
+    useEffect(() => {
+        getActiveCoupons().then(res => {
+            if (res.data.success) setCoupons(res.data.coupons)
+        })
+        const timer = setInterval(() => setCurrent(prev => prev + 1), 3000)
+        return () => clearInterval(timer)
+    }, [])
+
+    if (coupons.length === 0) return null
+
+    const c = coupons[current % coupons.length]
+
+    return (
+        <div className="bg-gradient-to-r from-orange-500 to-orange-400 rounded-2xl p-4 mb-6 flex items-center justify-between text-white">
+            <div className="flex items-center gap-3">
+                <span className="text-2xl">🎟️</span>
+                <div>
+                    <span className="font-bold">Special Offer! </span>
+                    <span className="text-orange-100">
+                        {c.type === 'percent' ? `${c.discount}% OFF` : `৳${c.discount} OFF`}
+                        {c.minOrder > 0 ? ` — সর্বনিম্ন ৳${c.minOrder} এর order এ` : ''}
+                    </span>
+                </div>
+            </div>
+            <div className="flex items-center gap-3">
+                <div className="bg-white bg-opacity-20 border-2 border-dashed border-white border-opacity-60 rounded-lg px-4 py-1">
+                    <span className="font-bold tracking-widest">{c.code}</span>
+                </div>
+                <button
+                    onClick={() => { navigator.clipboard.writeText(c.code); alert(`"${c.code}" copied! 🎉`) }}
+                    className="bg-white text-orange-500 px-3 py-1 rounded-lg font-bold text-sm hover:bg-orange-50"
+                >
+                    Copy
+                </button>
+            </div>
+        </div>
+    )
+}
 
 const Menu = () => {
     const [foods, setFoods] = useState([])
@@ -30,6 +73,9 @@ const Menu = () => {
         <div className="max-w-6xl mx-auto px-4 py-8">
             <h2 className="text-3xl font-bold text-gray-800 mb-6">আমাদের Menu</h2>
 
+            {/* Offer Banner */}
+            <OfferBanner />
+
             {/* Search Bar */}
             <div className="relative mb-6">
                 <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-xl">🔍</span>
@@ -56,15 +102,13 @@ const Menu = () => {
                         onClick={() => setCategory(cat)}
                         className={`px-5 py-2 rounded-full font-medium transition ${category === cat
                             ? 'bg-orange-500 text-white shadow-md'
-                            : 'bg-white text-gray-600 border border-gray-300 hover:border-orange-500'
-                            }`}
+                            : 'bg-white text-gray-600 border border-gray-300 hover:border-orange-500'}`}
                     >
                         {cat}
                     </button>
                 ))}
             </div>
 
-            {/* Results count */}
             {search && (
                 <p className="text-gray-500 text-sm mb-4">
                     "{search}" এর জন্য {filtered.length}টি ফলাফল
