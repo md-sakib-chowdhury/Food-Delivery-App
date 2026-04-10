@@ -721,6 +721,11 @@ const Home = () => {
                     </div>
                 </div>
             </div>
+            {/* Offers Section */}
+            <div className="max-w-6xl mx-auto px-4 pb-12">
+                <h2 className="text-2xl font-bold text-gray-800 mb-6">🎟️ Current Offers</h2>
+                <OffersSection />
+            </div>
 
             {/* ── FEATURED FOODS ── */}
             {foods.length > 0 && (
