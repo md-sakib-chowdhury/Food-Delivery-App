@@ -831,11 +831,7 @@ const OffersSection = () => {
             <h2 className="text-2xl font-bold text-gray-800 mb-6">🎟️ Current Offers</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {coupons.map(c => (
-                    <div
-                        key={c.code}
-                        className="relative overflow-hidden rounded-2xl p-6 flex items-center justify-between"
-                        style={{ background: '#FF5C00' }}
-                    >
+                    <div key={c.code} className="relative overflow-hidden rounded-2xl p-6 flex items-center justify-between" style={{ background: '#FF5C00' }}>
                         <div className="absolute top-0 right-0 w-28 h-28 rounded-full opacity-10 bg-white -mr-10 -mt-10 pointer-events-none" />
                         <div className="absolute bottom-0 left-0 w-16 h-16 rounded-full opacity-10 bg-white -ml-6 -mb-6 pointer-events-none" />
                         <div className="relative">
@@ -847,10 +843,7 @@ const OffersSection = () => {
                             </p>
                         </div>
                         <div className="relative flex items-center gap-3">
-                            <div
-                                className="text-white font-bold tracking-widest text-sm px-4 py-2 rounded-lg"
-                                style={{ background: 'rgba(255,255,255,0.18)', border: '1.5px dashed rgba(255,255,255,0.5)' }}
-                            >
+                            <div className="text-white font-bold tracking-widest text-sm px-4 py-2 rounded-lg" style={{ background: 'rgba(255,255,255,0.18)', border: '1.5px dashed rgba(255,255,255,0.5)' }}>
                                 {c.code}
                             </div>
                             <button
@@ -872,45 +865,31 @@ const OffersSection = () => {
 const FlashDealBanner = () => {
     const [time, setTime] = useState(5 * 3600 + 59 * 60 + 59)
     const [flipping, setFlipping] = useState({ h: false, m: false, s: false })
+    const [voicePlayed, setVoicePlayed] = useState(false)
 
-    // Voice announcement on page load
-    useEffect(() => {
-        const getVoices = () => new Promise(resolve => {
-            const voices = window.speechSynthesis.getVoices()
-            if (voices.length) return resolve(voices)
-            window.speechSynthesis.onvoiceschanged = () => resolve(window.speechSynthesis.getVoices())
-        })
-
-        const speak = (text, lang, pitch, rate, onEnd) => {
+    const playVoice = () => {
+        setVoicePlayed(true)
+        window.speechSynthesis.cancel()
+        const makeUtter = (text, pitch, rate) => {
             const utter = new SpeechSynthesisUtterance(text)
-            utter.lang = lang
+            utter.lang = 'en-US'
             utter.pitch = pitch
             utter.rate = rate
             utter.volume = 1
-            utter.onend = onEnd || null
-            window.speechSynthesis.speak(utter)
+            return utter
         }
+        const banglaPhonetic = makeUtter(
+            'Khuda lagle BanglaEats e order koro! Ajker flash deal e trish percent chhad paccho!',
+            1.95, 1.25
+        )
+        const englishLine = makeUtter(
+            'Hey! Order now on BanglaEats and get thirty percent off! Limited time only, hurry up!',
+            1.85, 1.35
+        )
+        banglaPhonetic.onend = () => window.speechSynthesis.speak(englishLine)
+        window.speechSynthesis.speak(banglaPhonetic)
+    }
 
-        const timer = setTimeout(async () => {
-            await getVoices()
-            window.speechSynthesis.cancel()
-            speak(
-                'ক্ষুধা লাগলে BanglaEats এ order করো! আজকের flash deal এ ত্রিশ পার্সেন্ট ছাড় পাচ্ছো!',
-                'bn-BD', 1.9, 1.3,
-                () => speak(
-                    'Hey! Order now on BanglaEats and get thirty percent off! Limited time only, hurry up!',
-                    'en-US', 1.85, 1.35, null
-                )
-            )
-        }, 1500)
-
-        return () => {
-            clearTimeout(timer)
-            window.speechSynthesis.cancel()
-        }
-    }, [])
-
-    // Countdown timer
     useEffect(() => {
         const interval = setInterval(() => {
             setTime(prev => {
@@ -925,7 +904,18 @@ const FlashDealBanner = () => {
                 return next
             })
         }, 1000)
-        return () => clearInterval(interval)
+
+        // প্রথম click এ automatically voice play হবে
+        const handleFirstClick = () => {
+            playVoice()
+            document.removeEventListener('click', handleFirstClick)
+        }
+        document.addEventListener('click', handleFirstClick)
+
+        return () => {
+            clearInterval(interval)
+            document.removeEventListener('click', handleFirstClick)
+        }
     }, [])
 
     const h = Math.floor(time / 3600)
@@ -936,14 +926,9 @@ const FlashDealBanner = () => {
     const TimeBlock = ({ val, label, flip }) => (
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
             <div style={{
-                background: '#1e1e1e',
-                border: '0.5px solid #333',
-                borderRadius: 10,
-                width: 56, height: 56,
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                fontSize: 26, fontWeight: 800,
-                color: flip ? '#FF5C00' : '#fff',
-                transition: 'color 0.15s',
+                background: '#1e1e1e', border: '0.5px solid #333', borderRadius: 10,
+                width: 56, height: 56, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                fontSize: 26, fontWeight: 800, color: flip ? '#FF5C00' : '#fff', transition: 'color 0.15s',
             }}>
                 {pad(val)}
             </div>
@@ -970,28 +955,22 @@ const FlashDealBanner = () => {
             `}</style>
             <div className="be-shine" />
 
-            {/* Scrolling marquee top bar */}
             <div style={{ background: '#FF5C00', padding: '8px 0', overflow: 'hidden', whiteSpace: 'nowrap' }}>
                 <div style={{ display: 'inline-block', animation: 'be-marquee 18s linear infinite', fontSize: 12, fontWeight: 600, color: '#fff', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
                     {Array(2).fill('⚡ Flash Deal চলছে \u00a0•\u00a0 আজকেই Order করো \u00a0•\u00a0 ৩০ মিনিটে ডেলিভারি \u00a0•\u00a0 সীমিত সময়ের অফার \u00a0•\u00a0 এখনই সুযোগ নাও \u00a0•\u00a0 ').join('')}
                 </div>
             </div>
 
-            {/* Main content */}
             <div className="max-w-6xl mx-auto px-6" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 24, padding: '28px 24px', flexWrap: 'wrap' }}>
-                {/* Left */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
                     <span className="be-fire" style={{ fontSize: 36 }}>🔥</span>
                     <div>
-                        <div style={{ fontSize: 11, fontWeight: 700, color: '#FF5C00', letterSpacing: '0.15em', textTransform: 'uppercase', marginBottom: 4 }}>
-                            ⚡ Limited Time Offer
-                        </div>
+                        <div style={{ fontSize: 11, fontWeight: 700, color: '#FF5C00', letterSpacing: '0.15em', textTransform: 'uppercase', marginBottom: 4 }}>⚡ Limited Time Offer</div>
                         <div style={{ fontSize: 22, fontWeight: 800, color: '#fff', lineHeight: 1.2 }}>আজকের Flash Deal!</div>
                         <div style={{ fontSize: 13, color: '#888', marginTop: 4 }}>যেকোনো order এ বিশাল ছাড় — সময় শেষ হওয়ার আগেই নাও</div>
                     </div>
                 </div>
 
-                {/* Countdown */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                     <TimeBlock val={h} label="ঘণ্টা" flip={flipping.h} />
                     <span className="be-sep">:</span>
@@ -1000,10 +979,19 @@ const FlashDealBanner = () => {
                     <TimeBlock val={s} label="সেকেন্ড" flip={flipping.s} />
                 </div>
 
-                {/* Right */}
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 10 }}>
                     <div className="be-badge">30% OFF</div>
                     <Link to="/menu" className="be-cta">এখনই Order করো →</Link>
+                    <button
+                        onClick={playVoice}
+                        style={{
+                            background: 'transparent', border: '1px solid rgba(255,255,255,0.2)',
+                            color: '#aaa', fontSize: 12, padding: '6px 14px', borderRadius: 99,
+                            cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6,
+                        }}
+                    >
+                        🔊 {voicePlayed ? 'আবার শুনো' : 'Voice শুনো'}
+                    </button>
                 </div>
             </div>
         </div>
@@ -1022,9 +1010,7 @@ const HowItWorks = () => {
         <div className="py-16 px-4" style={{ background: '#fff' }}>
             <div className="max-w-6xl mx-auto">
                 <div className="text-center mb-12">
-                    <span className="inline-block text-sm font-medium px-4 py-1 rounded-full mb-3" style={{ background: '#FFF0E5', color: '#FF5C00' }}>
-                        মাত্র ৩টি ধাপ
-                    </span>
+                    <span className="inline-block text-sm font-medium px-4 py-1 rounded-full mb-3" style={{ background: '#FFF0E5', color: '#FF5C00' }}>মাত্র ৩টি ধাপ</span>
                     <h2 className="text-3xl font-bold text-gray-800">কীভাবে কাজ করে?</h2>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8 relative">
@@ -1039,9 +1025,7 @@ const HowItWorks = () => {
                             </div>
                             <h3 className="text-lg font-bold text-gray-800 mb-2">{s.title}</h3>
                             <p className="text-gray-400 text-sm leading-relaxed max-w-xs">{s.desc}</p>
-                            {i < steps.length - 1 && (
-                                <div className="md:hidden text-2xl my-4" style={{ color: '#FF5C00' }}>↓</div>
-                            )}
+                            {i < steps.length - 1 && <div className="md:hidden text-2xl my-4" style={{ color: '#FF5C00' }}>↓</div>}
                         </div>
                     ))}
                 </div>
@@ -1068,14 +1052,9 @@ const Home = () => {
 
     return (
         <div>
-            {/* ── Hero ── */}
+            {/* Hero */}
             <div className="relative text-white overflow-hidden" style={{ minHeight: 580 }}>
-                <img
-                    src={HERO_BG}
-                    alt=""
-                    aria-hidden="true"
-                    style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center', zIndex: 0 }}
-                />
+                <img src={HERO_BG} alt="" aria-hidden="true" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center', zIndex: 0 }} />
                 <div style={{ position: 'absolute', inset: 0, zIndex: 1, background: 'linear-gradient(110deg, rgba(0,0,0,0.80) 0%, rgba(0,0,0,0.55) 55%, rgba(0,0,0,0.20) 100%)' }} />
                 <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 130, zIndex: 2, background: 'linear-gradient(to top, rgba(255,92,0,0.6) 0%, transparent 100%)' }} />
 
@@ -1083,30 +1062,16 @@ const Home = () => {
                     <span className="inline-block text-sm font-medium px-4 py-1 rounded-full mb-6 self-start" style={{ background: 'rgba(255,92,0,0.9)', border: '1px solid rgba(255,255,255,0.2)' }}>
                         ⚡ ৩০ মিনিটে ডেলিভারি
                     </span>
-                    <h1 style={{ fontSize: 'clamp(2.2rem, 4.5vw, 3.5rem)', fontWeight: 800, lineHeight: 1.2, marginBottom: 10 }}>
-                        ক্ষুধা লাগলে
-                    </h1>
+                    <h1 style={{ fontSize: 'clamp(2.2rem, 4.5vw, 3.5rem)', fontWeight: 800, lineHeight: 1.2, marginBottom: 10 }}>ক্ষুধা লাগলে</h1>
                     <div style={{ marginBottom: 14 }}>
-                        <span style={{ fontSize: 'clamp(2.8rem, 6vw, 5rem)', fontWeight: 900, letterSpacing: '-0.02em', background: 'linear-gradient(90deg, #FF5C00 0%, #FFD166 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text', display: 'inline' }}>
-                            BanglaEats
-                        </span>
-                        <span style={{ fontSize: 'clamp(2.2rem, 4.5vw, 3.5rem)', fontWeight: 800, marginLeft: 10, color: '#fff' }}>
-                            আছে!
-                        </span>
+                        <span style={{ fontSize: 'clamp(2.8rem, 6vw, 5rem)', fontWeight: 900, letterSpacing: '-0.02em', background: 'linear-gradient(90deg, #FF5C00 0%, #FFD166 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text', display: 'inline' }}>BanglaEats</span>
+                        <span style={{ fontSize: 'clamp(2.2rem, 4.5vw, 3.5rem)', fontWeight: 800, marginLeft: 10, color: '#fff' }}>আছে!</span>
                     </div>
-                    <p style={{ fontSize: 12, letterSpacing: '0.18em', textTransform: 'uppercase', color: '#FFD166', marginBottom: 20, fontWeight: 600, opacity: 0.9 }}>
-                        Dhaka's #1 Food Delivery Platform
-                    </p>
-                    <p style={{ fontSize: '1.1rem', color: 'rgba(255,255,255,0.75)', maxWidth: 460, marginBottom: 36, lineHeight: 1.6 }}>
-                        Dhaka-তে সেরা রেস্টুরেন্ট থেকে তাজা খাবার, দ্রুত ডেলিভারি
-                    </p>
+                    <p style={{ fontSize: 12, letterSpacing: '0.18em', textTransform: 'uppercase', color: '#FFD166', marginBottom: 20, fontWeight: 600, opacity: 0.9 }}>Dhaka's #1 Food Delivery Platform</p>
+                    <p style={{ fontSize: '1.1rem', color: 'rgba(255,255,255,0.75)', maxWidth: 460, marginBottom: 36, lineHeight: 1.6 }}>Dhaka-তে সেরা রেস্টুরেন্ট থেকে তাজা খাবার, দ্রুত ডেলিভারি</p>
                     <div className="flex gap-4 flex-wrap">
-                        <Link to="/menu" className="px-8 py-3 rounded-full font-bold text-lg transition" style={{ background: '#FF5C00', color: '#fff', boxShadow: '0 4px 24px rgba(255,92,0,0.5)' }}>
-                            এখনই Order করো 🍔
-                        </Link>
-                        <Link to="/orders" className="px-8 py-3 rounded-full font-bold text-lg transition" style={{ border: '2px solid rgba(255,255,255,0.45)', color: '#fff', background: 'rgba(255,255,255,0.08)' }}>
-                            My Orders
-                        </Link>
+                        <Link to="/menu" className="px-8 py-3 rounded-full font-bold text-lg transition" style={{ background: '#FF5C00', color: '#fff', boxShadow: '0 4px 24px rgba(255,92,0,0.5)' }}>এখনই Order করো 🍔</Link>
+                        <Link to="/orders" className="px-8 py-3 rounded-full font-bold text-lg transition" style={{ border: '2px solid rgba(255,255,255,0.45)', color: '#fff', background: 'rgba(255,255,255,0.08)' }}>My Orders</Link>
                     </div>
                 </div>
 
@@ -1115,14 +1080,10 @@ const Home = () => {
                 </svg>
             </div>
 
-            {/* ── Stats ── */}
+            {/* Stats */}
             <div style={{ background: '#FFF8F3', borderBottom: '0.5px solid #FFE0CC' }}>
                 <div className="max-w-6xl mx-auto px-4 py-6 grid grid-cols-3 divide-x divide-orange-100 text-center">
-                    {[
-                        { num: '৫০০+', label: 'খুশি Customer' },
-                        { num: '৩০', label: 'মিনিটে Delivery' },
-                        { num: '১০০+', label: 'Food Item' },
-                    ].map(s => (
+                    {[{ num: '৫০০+', label: 'খুশি Customer' }, { num: '৩০', label: 'মিনিটে Delivery' }, { num: '১০০+', label: 'Food Item' }].map(s => (
                         <div key={s.label}>
                             <div className="text-3xl font-bold" style={{ color: '#FF5C00' }}>{s.num}</div>
                             <div className="text-sm mt-1 text-gray-400">{s.label}</div>
@@ -1131,7 +1092,7 @@ const Home = () => {
                 </div>
             </div>
 
-            {/* ── Categories ── */}
+            {/* Categories */}
             <div className="max-w-6xl mx-auto px-4 py-12">
                 <div className="flex items-center justify-between mb-7">
                     <h2 className="text-2xl font-bold text-gray-800">Category বেছে নাও</h2>
@@ -1146,16 +1107,9 @@ const Home = () => {
                         { name: 'Dessert', icon: '🍰', count: '15 items' },
                         { name: 'Drinks', icon: '🥤', count: '10 items' },
                     ].map(cat => (
-                        <Link
-                            to="/menu"
-                            key={cat.name}
-                            className="group relative flex flex-col items-center rounded-2xl p-5 pb-4 transition hover:-translate-y-1 cursor-pointer overflow-hidden"
-                            style={{ border: '0.5px solid #f0e0d6', background: '#fff' }}
-                        >
+                        <Link to="/menu" key={cat.name} className="group relative flex flex-col items-center rounded-2xl p-5 pb-4 transition hover:-translate-y-1 cursor-pointer overflow-hidden" style={{ border: '0.5px solid #f0e0d6', background: '#fff' }}>
                             <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity rounded-2xl" style={{ background: '#FFF5F0' }} />
-                            <div className="relative z-10 flex items-center justify-center mb-3" style={{ width: 56, height: 56, borderRadius: 16, background: '#FFF0E5', fontSize: 26 }}>
-                                {cat.icon}
-                            </div>
+                            <div className="relative z-10 flex items-center justify-center mb-3" style={{ width: 56, height: 56, borderRadius: 16, background: '#FFF0E5', fontSize: 26 }}>{cat.icon}</div>
                             <span className="relative z-10 text-sm font-semibold transition-colors group-hover:text-orange-500" style={{ color: '#555' }}>{cat.name}</span>
                             <span className="relative z-10 text-xs mt-1" style={{ color: '#bbb' }}>{cat.count}</span>
                         </Link>
@@ -1163,13 +1117,13 @@ const Home = () => {
                 </div>
             </div>
 
-            {/* ── Flash Deal Banner ── */}
+            {/* Flash Deal Banner */}
             <FlashDealBanner />
 
-            {/* ── How It Works ── */}
+            {/* How It Works */}
             <HowItWorks />
 
-            {/* ── Featured Foods ── */}
+            {/* Featured Foods */}
             {foods.length > 0 && (
                 <div className="max-w-6xl mx-auto px-4 pb-12">
                     <div className="flex justify-between items-center mb-6">
@@ -1181,18 +1135,14 @@ const Home = () => {
                             <div key={food._id} className="bg-white rounded-2xl overflow-hidden group transition hover:shadow-md" style={{ border: '0.5px solid #f0e0d6' }}>
                                 <div className="relative overflow-hidden">
                                     <img src={food.image} alt={food.name} className="w-full h-48 object-cover group-hover:scale-105 transition duration-300" />
-                                    <span className="absolute top-3 left-3 text-white text-xs font-bold px-3 py-1 rounded-full" style={{ background: '#FF5C00' }}>
-                                        {food.category}
-                                    </span>
+                                    <span className="absolute top-3 left-3 text-white text-xs font-bold px-3 py-1 rounded-full" style={{ background: '#FF5C00' }}>{food.category}</span>
                                 </div>
                                 <div className="p-4">
                                     <h3 className="text-lg font-bold text-gray-800 mb-1">{food.name}</h3>
                                     <p className="text-gray-400 text-sm mb-4 line-clamp-2">{food.description}</p>
                                     <div className="flex justify-between items-center">
                                         <span className="font-bold text-xl" style={{ color: '#FF5C00' }}>৳{food.price}</span>
-                                        <button onClick={() => addToCart(food)} className="text-white text-sm font-medium px-4 py-2 rounded-full transition hover:opacity-90" style={{ background: '#FF5C00' }}>
-                                            + Add to Cart
-                                        </button>
+                                        <button onClick={() => addToCart(food)} className="text-white text-sm font-medium px-4 py-2 rounded-full transition hover:opacity-90" style={{ background: '#FF5C00' }}>+ Add to Cart</button>
                                     </div>
                                 </div>
                             </div>
@@ -1201,16 +1151,14 @@ const Home = () => {
                 </div>
             )}
 
-            {/* ── Coupons ── */}
+            {/* Coupons */}
             <OffersSection />
 
-            {/* ── Why BanglaEats ── */}
+            {/* Why BanglaEats */}
             <div style={{ background: '#FFF8F3' }} className="py-16 px-4">
                 <div className="max-w-6xl mx-auto">
                     <div className="text-center mb-12">
-                        <span className="inline-block text-xs font-semibold px-4 py-1 rounded-full mb-3 uppercase tracking-widest" style={{ background: '#FFF0E5', color: '#FF5C00' }}>
-                            আমাদের সুবিধা
-                        </span>
+                        <span className="inline-block text-xs font-semibold px-4 py-1 rounded-full mb-3 uppercase tracking-widest" style={{ background: '#FFF0E5', color: '#FF5C00' }}>আমাদের সুবিধা</span>
                         <h2 className="text-3xl font-bold text-gray-900 mb-2">কেন BanglaEats বেছে নেবে?</h2>
                         <p className="text-gray-400 text-sm">Dhaka-তে সবচেয়ে ভালো food delivery experience আমরাই দিই</p>
                     </div>
@@ -1223,21 +1171,17 @@ const Home = () => {
                             <div key={f.title} className="bg-white rounded-3xl p-8 relative overflow-hidden text-left" style={{ border: '0.5px solid #f0e0d6' }}>
                                 <div className="absolute top-0 left-0 right-0 h-1 rounded-t-3xl" style={{ background: f.accent }} />
                                 <div className="absolute bottom-0 right-0 w-20 h-20 rounded-full opacity-10 -mb-6 -mr-6" style={{ background: f.accent }} />
-                                <div className="flex items-center justify-center mb-5" style={{ width: 64, height: 64, borderRadius: 18, background: f.iconBg, fontSize: 30 }}>
-                                    {f.icon}
-                                </div>
+                                <div className="flex items-center justify-center mb-5" style={{ width: 64, height: 64, borderRadius: 18, background: f.iconBg, fontSize: 30 }}>{f.icon}</div>
                                 <h3 className="text-lg font-bold text-gray-900 mb-2">{f.title}</h3>
                                 <p className="text-gray-400 text-sm leading-relaxed mb-5">{f.desc}</p>
-                                <span className="inline-block text-xs font-semibold px-3 py-1 rounded-full" style={{ background: f.tagBg, color: f.tagColor }}>
-                                    {f.tag}
-                                </span>
+                                <span className="inline-block text-xs font-semibold px-3 py-1 rounded-full" style={{ background: f.tagBg, color: f.tagColor }}>{f.tag}</span>
                             </div>
                         ))}
                     </div>
                 </div>
             </div>
 
-            {/* ── Footer ── */}
+            {/* Footer */}
             <footer style={{ background: '#111111', color: '#aaa' }}>
                 <div className="max-w-6xl mx-auto px-6 py-14 grid grid-cols-1 md:grid-cols-4 gap-10">
                     <div className="md:col-span-2">
@@ -1245,14 +1189,10 @@ const Home = () => {
                             <span style={{ fontSize: 28 }}>🍔</span>
                             <span style={{ fontSize: 24, fontWeight: 900, background: 'linear-gradient(90deg, #FF5C00, #FFD166)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text', letterSpacing: '-0.02em' }}>BanglaEats</span>
                         </div>
-                        <p style={{ fontSize: 14, lineHeight: 1.7, color: '#888', maxWidth: 300, marginBottom: 20 }}>
-                            Dhaka-তে সবচেয়ে দ্রুত ও সেরা food delivery platform। তাজা খাবার, সেরা রেস্টুরেন্ট, মাত্র ৩০ মিনিটে।
-                        </p>
+                        <p style={{ fontSize: 14, lineHeight: 1.7, color: '#888', maxWidth: 300, marginBottom: 20 }}>Dhaka-তে সবচেয়ে দ্রুত ও সেরা food delivery platform। তাজা খাবার, সেরা রেস্টুরেন্ট, মাত্র ৩০ মিনিটে।</p>
                         <div style={{ display: 'flex', gap: 10 }}>
                             {['f', 'in', 'ig'].map(s => (
-                                <div key={s} style={{ width: 36, height: 36, borderRadius: 8, background: '#222', border: '0.5px solid #333', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, color: '#666', fontWeight: 700, cursor: 'pointer', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                                    {s}
-                                </div>
+                                <div key={s} style={{ width: 36, height: 36, borderRadius: 8, background: '#222', border: '0.5px solid #333', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, color: '#666', fontWeight: 700, cursor: 'pointer', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{s}</div>
                             ))}
                         </div>
                     </div>
@@ -1266,11 +1206,7 @@ const Home = () => {
                     </div>
                     <div>
                         <div style={{ fontSize: 13, fontWeight: 700, color: '#fff', marginBottom: 16, letterSpacing: '0.08em', textTransform: 'uppercase' }}>Contact</div>
-                        {[
-                            { icon: '📍', text: 'Dhaka, Bangladesh' },
-                            { icon: '📞', text: '+880 1XXX-XXXXXX' },
-                            { icon: '✉️', text: 'hello@banglaeats.com' },
-                        ].map(c => (
+                        {[{ icon: '📍', text: 'Dhaka, Bangladesh' }, { icon: '📞', text: '+880 1XXX-XXXXXX' }, { icon: '✉️', text: 'hello@banglaeats.com' }].map(c => (
                             <div key={c.text} style={{ display: 'flex', gap: 8, alignItems: 'flex-start', marginBottom: 12 }}>
                                 <span style={{ fontSize: 14, marginTop: 1 }}>{c.icon}</span>
                                 <span style={{ fontSize: 13, color: '#777', lineHeight: 1.5 }}>{c.text}</span>
@@ -1294,4 +1230,3 @@ const Home = () => {
 }
 
 export default Home
-
