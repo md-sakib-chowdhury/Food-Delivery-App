@@ -814,18 +814,14 @@ import { useCart } from '../context/CartContext'
 
 const HERO_BG = 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=1400&auto=format&fit=crop&q=85'
 
-/* ── Offers Section ── */
 const OffersSection = () => {
     const [coupons, setCoupons] = useState([])
-
     useEffect(() => {
         getActiveCoupons().then(res => {
             if (res.data.success) setCoupons(res.data.coupons)
         })
     }, [])
-
     if (coupons.length === 0) return null
-
     return (
         <div className="px-4 pb-12 max-w-6xl mx-auto">
             <h2 className="text-2xl font-bold text-gray-800 mb-6">🎟️ Current Offers</h2>
@@ -846,11 +842,7 @@ const OffersSection = () => {
                             <div className="text-white font-bold tracking-widest text-sm px-4 py-2 rounded-lg" style={{ background: 'rgba(255,255,255,0.18)', border: '1.5px dashed rgba(255,255,255,0.5)' }}>
                                 {c.code}
                             </div>
-                            <button
-                                onClick={() => { navigator.clipboard.writeText(c.code); alert(`"${c.code}" copied! 🎉`) }}
-                                className="font-bold text-sm px-4 py-2 rounded-lg transition"
-                                style={{ background: '#fff', color: '#FF5C00' }}
-                            >
+                            <button onClick={() => { navigator.clipboard.writeText(c.code); alert(`"${c.code}" copied! 🎉`) }} className="font-bold text-sm px-4 py-2 rounded-lg transition" style={{ background: '#fff', color: '#FF5C00' }}>
                                 Copy
                             </button>
                         </div>
@@ -861,7 +853,6 @@ const OffersSection = () => {
     )
 }
 
-/* ── Flash Deal Banner ── */
 const FlashDealBanner = () => {
     const [time, setTime] = useState(5 * 3600 + 59 * 60 + 59)
     const [flipping, setFlipping] = useState({ h: false, m: false, s: false })
@@ -878,14 +869,8 @@ const FlashDealBanner = () => {
             utter.volume = 1
             return utter
         }
-        const banglaPhonetic = makeUtter(
-            'Khuda lagle BanglaEats e order koro! Ajker flash deal e trish percent chhad paccho!',
-            1.95, 1.25
-        )
-        const englishLine = makeUtter(
-            'Hey! Order now on BanglaEats and get thirty percent off! Limited time only, hurry up!',
-            1.85, 1.35
-        )
+        const banglaPhonetic = makeUtter('Khuda lagle BanglaEats e order koro! Ajker flash deal e trish percent chhad paccho!', 1.95, 1.25)
+        const englishLine = makeUtter('Hey! Order now on BanglaEats and get thirty percent off! Limited time only, hurry up!', 1.85, 1.35)
         banglaPhonetic.onend = () => window.speechSynthesis.speak(englishLine)
         window.speechSynthesis.speak(banglaPhonetic)
     }
@@ -894,47 +879,26 @@ const FlashDealBanner = () => {
         const interval = setInterval(() => {
             setTime(prev => {
                 const next = prev <= 0 ? 5 * 3600 + 59 * 60 + 59 : prev - 1
-                const ph = Math.floor(prev / 3600)
-                const pm = Math.floor((prev % 3600) / 60)
-                const ps = prev % 60
-                const nh = Math.floor(next / 3600)
-                const nm = Math.floor((next % 3600) / 60)
-                const ns = next % 60
+                const ph = Math.floor(prev / 3600), pm = Math.floor((prev % 3600) / 60), ps = prev % 60
+                const nh = Math.floor(next / 3600), nm = Math.floor((next % 3600) / 60), ns = next % 60
                 setFlipping({ h: ph !== nh, m: pm !== nm, s: ps !== ns })
                 return next
             })
         }, 1000)
-
-        // প্রথম click এ automatically voice play হবে
-        const handleFirstClick = () => {
-            playVoice()
-            document.removeEventListener('click', handleFirstClick)
-        }
+        const handleFirstClick = () => { playVoice(); document.removeEventListener('click', handleFirstClick) }
         document.addEventListener('click', handleFirstClick)
-
-        return () => {
-            clearInterval(interval)
-            document.removeEventListener('click', handleFirstClick)
-        }
+        return () => { clearInterval(interval); document.removeEventListener('click', handleFirstClick) }
     }, [])
 
-    const h = Math.floor(time / 3600)
-    const m = Math.floor((time % 3600) / 60)
-    const s = time % 60
+    const h = Math.floor(time / 3600), m = Math.floor((time % 3600) / 60), s = time % 60
     const pad = n => String(n).padStart(2, '0')
 
     const TimeBlock = ({ val, label, flip }) => (
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-            <div style={{
-                background: '#1e1e1e', border: '0.5px solid #333', borderRadius: 10,
-                width: 56, height: 56, display: 'flex', alignItems: 'center', justifyContent: 'center',
-                fontSize: 26, fontWeight: 800, color: flip ? '#FF5C00' : '#fff', transition: 'color 0.15s',
-            }}>
+            <div style={{ background: '#1e1e1e', border: '0.5px solid #333', borderRadius: 10, width: 56, height: 56, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 26, fontWeight: 800, color: flip ? '#FF5C00' : '#fff', transition: 'color 0.15s' }}>
                 {pad(val)}
             </div>
-            <div style={{ fontSize: 10, color: '#555', marginTop: 5, letterSpacing: '0.08em', textTransform: 'uppercase', fontWeight: 600 }}>
-                {label}
-            </div>
+            <div style={{ fontSize: 10, color: '#555', marginTop: 5, letterSpacing: '0.08em', textTransform: 'uppercase', fontWeight: 600 }}>{label}</div>
         </div>
     )
 
@@ -946,12 +910,18 @@ const FlashDealBanner = () => {
                 @keyframes be-pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.25; } }
                 @keyframes be-glow { 0%,100% { box-shadow: 0 0 0 0 rgba(255,92,0,0); } 50% { box-shadow: 0 0 20px 6px rgba(255,92,0,0.4); } }
                 @keyframes be-shine { 0% { left: -100%; } 60%,100% { left: 160%; } }
+                @keyframes be-speaker-pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.12); } }
+                @keyframes be-wave1 { 0%, 100% { opacity: 0.3; transform: scale(1); } 50% { opacity: 1; transform: scale(1.3); } }
+                @keyframes be-wave2 { 0%, 100% { opacity: 0.2; transform: scale(1); } 50% { opacity: 0.8; transform: scale(1.6); } }
+                @keyframes be-wave3 { 0%, 100% { opacity: 0.1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(2); } }
                 .be-shine { position: absolute; top: 0; left: -100%; width: 60%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.04), transparent); animation: be-shine 5s ease-in-out infinite; pointer-events: none; }
                 .be-fire { display: inline-block; animation: be-bounce 0.7s ease-in-out infinite alternate; }
                 .be-sep { font-size: 24px; font-weight: 800; color: #FF5C00; margin-bottom: 18px; animation: be-pulse 1s ease-in-out infinite; }
                 .be-badge { background: #FF5C00; color: #fff; font-size: 28px; font-weight: 900; padding: 8px 20px; border-radius: 12px; animation: be-glow 2s ease-in-out infinite; }
                 .be-cta { background: #fff; color: #111; font-size: 14px; font-weight: 700; padding: 12px 28px; border-radius: 99px; display: inline-block; transition: transform 0.15s, background 0.15s; text-decoration: none; }
                 .be-cta:hover { background: #FFD166 !important; transform: scale(1.03); }
+                .be-speaker-inner { transition: all 0.3s ease; }
+                .be-speaker-btn:hover .be-speaker-inner { transform: scale(1.08); }
             `}</style>
             <div className="be-shine" />
 
@@ -982,15 +952,32 @@ const FlashDealBanner = () => {
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 10 }}>
                     <div className="be-badge">30% OFF</div>
                     <Link to="/menu" className="be-cta">এখনই Order করো →</Link>
-                    <button
-                        onClick={playVoice}
-                        style={{
-                            background: 'transparent', border: '1px solid rgba(255,255,255,0.2)',
-                            color: '#aaa', fontSize: 12, padding: '6px 14px', borderRadius: 99,
-                            cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6,
-                        }}
-                    >
-                        🔊 {voicePlayed ? 'আবার শুনো' : 'Voice শুনো'}
+
+                    {/* 3D Animated Speaker Button */}
+                    <button onClick={playVoice} className="be-speaker-btn" style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>
+                        <div style={{ position: 'relative', width: 64, height: 64, animation: voicePlayed ? 'be-speaker-pulse 0.8s ease-in-out infinite' : 'none' }}>
+                            {voicePlayed && <>
+                                <div style={{ position: 'absolute', inset: 0, borderRadius: '50%', border: '2px solid #FF5C00', animation: 'be-wave1 1.2s ease-in-out infinite' }} />
+                                <div style={{ position: 'absolute', inset: -10, borderRadius: '50%', border: '2px solid #FF5C00', animation: 'be-wave2 1.2s ease-in-out infinite 0.2s' }} />
+                                <div style={{ position: 'absolute', inset: -20, borderRadius: '50%', border: '2px solid #FF5C00', animation: 'be-wave3 1.2s ease-in-out infinite 0.4s' }} />
+                            </>}
+                            <div className="be-speaker-inner" style={{
+                                position: 'relative', zIndex: 2,
+                                width: 64, height: 64, borderRadius: '50%',
+                                background: voicePlayed ? 'linear-gradient(145deg, #FF5C00, #ff8c00)' : 'linear-gradient(145deg, #2a2a2a, #1a1a1a)',
+                                boxShadow: voicePlayed
+                                    ? '0 8px 32px rgba(255,92,0,0.5), inset 0 2px 4px rgba(255,255,255,0.15), inset 0 -2px 4px rgba(0,0,0,0.3)'
+                                    : '0 8px 24px rgba(0,0,0,0.5), inset 0 2px 4px rgba(255,255,255,0.08), inset 0 -2px 4px rgba(0,0,0,0.4)',
+                                display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+                            }}>
+                                <span style={{ fontSize: 26, lineHeight: 1, filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))' }}>
+                                    {voicePlayed ? '🔊' : '🔇'}
+                                </span>
+                                <span style={{ fontSize: 8, fontWeight: 700, marginTop: 3, letterSpacing: '0.05em', color: voicePlayed ? 'rgba(255,255,255,0.9)' : 'rgba(255,255,255,0.4)', textTransform: 'uppercase' }}>
+                                    {voicePlayed ? 'Playing' : 'Tap'}
+                                </span>
+                            </div>
+                        </div>
                     </button>
                 </div>
             </div>
@@ -998,14 +985,12 @@ const FlashDealBanner = () => {
     )
 }
 
-/* ── How It Works ── */
 const HowItWorks = () => {
     const steps = [
         { step: '01', icon: '🍔', title: 'খাবার বেছে নাও', desc: 'Menu থেকে তোমার পছন্দের খাবার select করো এবং cart এ add করো।' },
         { step: '02', icon: '💳', title: 'Payment করো', desc: 'bKash, Card বা Cash on Delivery — যেকোনো সহজ উপায়ে payment করো।' },
         { step: '03', icon: '🛵', title: 'ডেলিভারি পাও', desc: 'মাত্র ৩০ মিনিটের মধ্যে গরম খাবার তোমার দরজায় পৌঁছে যাবে।' },
     ]
-
     return (
         <div className="py-16 px-4" style={{ background: '#fff' }}>
             <div className="max-w-6xl mx-auto">
@@ -1019,9 +1004,7 @@ const HowItWorks = () => {
                         <div key={i} className="flex flex-col items-center text-center relative">
                             <div className="w-24 h-24 rounded-full flex items-center justify-center mb-6 relative z-10" style={{ background: '#FFF0E5', border: '3px solid #FF5C00' }}>
                                 <span style={{ fontSize: 38 }}>{s.icon}</span>
-                                <div className="absolute -top-1 -right-1 w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold text-white" style={{ background: '#FF5C00' }}>
-                                    {s.step}
-                                </div>
+                                <div className="absolute -top-1 -right-1 w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold text-white" style={{ background: '#FF5C00' }}>{s.step}</div>
                             </div>
                             <h3 className="text-lg font-bold text-gray-800 mb-2">{s.title}</h3>
                             <p className="text-gray-400 text-sm leading-relaxed max-w-xs">{s.desc}</p>
@@ -1030,16 +1013,13 @@ const HowItWorks = () => {
                     ))}
                 </div>
                 <div className="text-center mt-12">
-                    <Link to="/menu" className="inline-block px-10 py-4 rounded-full font-bold text-lg text-white transition hover:opacity-90" style={{ background: '#FF5C00' }}>
-                        এখনই শুরু করো →
-                    </Link>
+                    <Link to="/menu" className="inline-block px-10 py-4 rounded-full font-bold text-lg text-white transition hover:opacity-90" style={{ background: '#FF5C00' }}>এখনই শুরু করো →</Link>
                 </div>
             </div>
         </div>
     )
 }
 
-/* ── Main Home ── */
 const Home = () => {
     const [foods, setFoods] = useState([])
     const { addToCart } = useCart()
@@ -1057,11 +1037,8 @@ const Home = () => {
                 <img src={HERO_BG} alt="" aria-hidden="true" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center', zIndex: 0 }} />
                 <div style={{ position: 'absolute', inset: 0, zIndex: 1, background: 'linear-gradient(110deg, rgba(0,0,0,0.80) 0%, rgba(0,0,0,0.55) 55%, rgba(0,0,0,0.20) 100%)' }} />
                 <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 130, zIndex: 2, background: 'linear-gradient(to top, rgba(255,92,0,0.6) 0%, transparent 100%)' }} />
-
                 <div className="relative max-w-6xl mx-auto px-6 flex flex-col justify-center" style={{ zIndex: 3, minHeight: 580, paddingTop: 90, paddingBottom: 110 }}>
-                    <span className="inline-block text-sm font-medium px-4 py-1 rounded-full mb-6 self-start" style={{ background: 'rgba(255,92,0,0.9)', border: '1px solid rgba(255,255,255,0.2)' }}>
-                        ⚡ ৩০ মিনিটে ডেলিভারি
-                    </span>
+                    <span className="inline-block text-sm font-medium px-4 py-1 rounded-full mb-6 self-start" style={{ background: 'rgba(255,92,0,0.9)', border: '1px solid rgba(255,255,255,0.2)' }}>⚡ ৩০ মিনিটে ডেলিভারি</span>
                     <h1 style={{ fontSize: 'clamp(2.2rem, 4.5vw, 3.5rem)', fontWeight: 800, lineHeight: 1.2, marginBottom: 10 }}>ক্ষুধা লাগলে</h1>
                     <div style={{ marginBottom: 14 }}>
                         <span style={{ fontSize: 'clamp(2.8rem, 6vw, 5rem)', fontWeight: 900, letterSpacing: '-0.02em', background: 'linear-gradient(90deg, #FF5C00 0%, #FFD166 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text', display: 'inline' }}>BanglaEats</span>
@@ -1074,7 +1051,6 @@ const Home = () => {
                         <Link to="/orders" className="px-8 py-3 rounded-full font-bold text-lg transition" style={{ border: '2px solid rgba(255,255,255,0.45)', color: '#fff', background: 'rgba(255,255,255,0.08)' }}>My Orders</Link>
                     </div>
                 </div>
-
                 <svg viewBox="0 0 1440 60" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ position: 'absolute', bottom: -1, left: 0, right: 0, zIndex: 4, display: 'block' }}>
                     <path d="M0 60L1440 60L1440 30C1440 30 1080 0 720 0C360 0 0 30 0 30L0 60Z" fill="#FFF8F3" />
                 </svg>
@@ -1117,7 +1093,7 @@ const Home = () => {
                 </div>
             </div>
 
-            {/* Flash Deal Banner */}
+            {/* Flash Deal */}
             <FlashDealBanner />
 
             {/* How It Works */}
