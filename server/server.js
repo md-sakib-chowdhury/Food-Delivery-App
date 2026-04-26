@@ -10,10 +10,10 @@
 // const httpServer = createServer(app)
 
 // export const io = new Server(httpServer, {
-//     cors: { origin: 'http://localhost:5173', methods: ['GET', 'POST'] }
+//     cors: { origin: '*', methods: ['GET', 'POST'] }
 // })
 
-// app.use(cors({ origin: 'http://localhost:5173' }))
+// app.use(cors({ origin: '*' }))
 // app.use(express.json())
 
 // mongoose.connect(process.env.MONGO_URI)
@@ -46,10 +46,10 @@ const app = express()
 const httpServer = createServer(app)
 
 export const io = new Server(httpServer, {
-    cors: { origin: 'http://localhost:5173', methods: ['GET', 'POST'] }
+    cors: { origin: '*', methods: ['GET', 'POST'] }
 })
 
-app.use(cors({ origin: 'http://localhost:5173' }))
+app.use(cors({ origin: '*' }))
 app.use(express.json())
 
 mongoose.connect(process.env.MONGO_URI)
