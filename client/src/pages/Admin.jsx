@@ -1016,10 +1016,51 @@ const CouponTab = () => {
     )
 }
 
-// ✅ নতুন Admin Register Tab
-const AdminRegisterTab = () => {
+// ✅ Password Toggle Input Component
+const PasswordInput = ({ placeholder, value, onChange }) => {
+    const [show, setShow] = useState(false)
+    return (
+        <div className="relative">
+            <input
+                type={show ? 'text' : 'password'}
+                placeholder={placeholder}
+                className="w-full border border-gray-200 rounded-xl px-4 py-3 pr-12 focus:outline-none focus:border-orange-500"
+                value={value}
+                onChange={onChange}
+                required
+            />
+            <button
+                type="button"
+                onClick={() => setShow(!show)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+            >
+                {show ? (
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+                    </svg>
+                ) : (
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    </svg>
+                )}
+            </button>
+        </div>
+    )
+}
+
+// ✅ Admin Register + Delete Tab
+const AdminRegisterTab = ({ currentUser }) => {
     const [form, setForm] = useState({ name: '', email: '', password: '', adminSecret: '' })
     const [msg, setMsg] = useState({ text: '', type: '' })
+    const [admins, setAdmins] = useState([])
+
+    const loadAdmins = async () => {
+        const res = await api.get('/auth/admins')
+        if (res.data.success) setAdmins(res.data.admins)
+    }
+
+    useEffect(() => { loadAdmins() }, [])
 
     const handleRegister = async (e) => {
         e.preventDefault()
@@ -1028,6 +1069,7 @@ const AdminRegisterTab = () => {
             if (res.data.success) {
                 setMsg({ text: 'নতুন Admin তৈরি হয়েছে! ✅', type: 'success' })
                 setForm({ name: '', email: '', password: '', adminSecret: '' })
+                loadAdmins()
             } else {
                 setMsg({ text: res.data.message, type: 'error' })
             }
@@ -1037,48 +1079,82 @@ const AdminRegisterTab = () => {
         setTimeout(() => setMsg({ text: '', type: '' }), 3000)
     }
 
+    const handleDelete = async (id, name) => {
+        if (!window.confirm(`"${name}" কে delete করবে?`)) return
+        const res = await api.delete(`/auth/admins/${id}`)
+        if (res.data.success) loadAdmins()
+    }
+
     return (
         <div>
-            <h2 className="text-2xl font-bold text-gray-800 mb-6">নতুন Admin যোগ করো</h2>
-            <div className="bg-white rounded-2xl shadow p-8 max-w-md">
-                {msg.text && (
-                    <div className={`p-3 rounded-xl mb-4 text-sm ${msg.type === 'success' ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-600'}`}>
-                        {msg.text}
+            <h2 className="text-2xl font-bold text-gray-800 mb-6">Admin Management</h2>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+                {/* নতুন Admin Form */}
+                <div className="bg-white rounded-2xl shadow p-6">
+                    <h3 className="font-bold text-gray-800 mb-4">👤 নতুন Admin যোগ করো</h3>
+                    {msg.text && (
+                        <div className={`p-3 rounded-xl mb-4 text-sm ${msg.type === 'success' ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-600'}`}>
+                            {msg.text}
+                        </div>
+                    )}
+                    <form onSubmit={handleRegister} className="flex flex-col gap-4">
+                        <input
+                            type="text" placeholder="নাম"
+                            className="border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:border-orange-500"
+                            value={form.name}
+                            onChange={e => setForm({ ...form, name: e.target.value })}
+                            required
+                        />
+                        <input
+                            type="email" placeholder="Email"
+                            className="border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:border-orange-500"
+                            value={form.email}
+                            onChange={e => setForm({ ...form, email: e.target.value })}
+                            required
+                        />
+                        {/* ✅ Password toggle */}
+                        <PasswordInput
+                            placeholder="Password"
+                            value={form.password}
+                            onChange={e => setForm({ ...form, password: e.target.value })}
+                        />
+                        {/* ✅ Secret Key toggle */}
+                        <PasswordInput
+                            placeholder="Admin Secret Key"
+                            value={form.adminSecret}
+                            onChange={e => setForm({ ...form, adminSecret: e.target.value })}
+                        />
+                        <button type="submit" className="bg-orange-500 text-white py-3 rounded-xl font-bold hover:bg-orange-600">
+                            👤 Admin তৈরি করো
+                        </button>
+                    </form>
+                </div>
+
+                {/* Admin List */}
+                <div className="bg-white rounded-2xl shadow p-6">
+                    <h3 className="font-bold text-gray-800 mb-4">🛡️ সব Admins ({admins.length})</h3>
+                    <div className="flex flex-col gap-3">
+                        {admins.map(admin => (
+                            <div key={admin._id} className="flex items-center justify-between p-3 bg-gray-50 rounded-xl">
+                                <div>
+                                    <div className="font-medium text-gray-800">{admin.name}</div>
+                                    <div className="text-sm text-gray-400">{admin.email}</div>
+                                </div>
+                                {currentUser?.email !== admin.email ? (
+                                    <button
+                                        onClick={() => handleDelete(admin._id, admin.name)}
+                                        className="bg-red-50 text-red-500 px-3 py-2 rounded-lg text-sm font-medium hover:bg-red-100"
+                                    >
+                                        🗑️ Delete
+                                    </button>
+                                ) : (
+                                    <span className="text-xs text-green-500 font-medium px-3 py-2 bg-green-50 rounded-lg">আপনি</span>
+                                )}
+                            </div>
+                        ))}
                     </div>
-                )}
-                <form onSubmit={handleRegister} className="flex flex-col gap-4">
-                    <input
-                        type="text" placeholder="নাম"
-                        className="border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:border-orange-500"
-                        value={form.name}
-                        onChange={e => setForm({ ...form, name: e.target.value })}
-                        required
-                    />
-                    <input
-                        type="email" placeholder="Email"
-                        className="border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:border-orange-500"
-                        value={form.email}
-                        onChange={e => setForm({ ...form, email: e.target.value })}
-                        required
-                    />
-                    <input
-                        type="password" placeholder="Password"
-                        className="border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:border-orange-500"
-                        value={form.password}
-                        onChange={e => setForm({ ...form, password: e.target.value })}
-                        required
-                    />
-                    <input
-                        type="password" placeholder="Admin Secret Key"
-                        className="border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:border-orange-500"
-                        value={form.adminSecret}
-                        onChange={e => setForm({ ...form, adminSecret: e.target.value })}
-                        required
-                    />
-                    <button type="submit" className="bg-orange-500 text-white py-3 rounded-xl font-bold hover:bg-orange-600">
-                        👤 Admin তৈরি করো
-                    </button>
-                </form>
+                </div>
             </div>
         </div>
     )
@@ -1171,7 +1247,7 @@ const Admin = () => {
                         { id: 'foods', icon: '🍽️', label: 'সব Foods' },
                         { id: 'orders', icon: '📦', label: 'Orders' },
                         { id: 'coupons', icon: '🎟️', label: 'Coupons' },
-                        { id: 'register', icon: '👤', label: 'New Admin যোগ করো' },
+                        { id: 'register', icon: '👤', label: 'Admin Management' },
                     ].map(item => (
                         <button
                             key={item.id}
@@ -1191,10 +1267,7 @@ const Admin = () => {
                         <span>🏠</span><span>Home এ যাও</span>
                     </button>
                     <button
-                        onClick={() => {
-                            logout()
-                            navigate('/login')
-                        }}
+                        onClick={() => { logout(); navigate('/login') }}
                         className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-red-500 hover:bg-red-50 transition font-medium"
                     >
                         <span>🚪</span><span>Logout</span>
@@ -1417,8 +1490,7 @@ const Admin = () => {
                     </div>
                 )}
 
-                {/* ✅ নতুন Admin Register Tab */}
-                {activeTab === 'register' && <AdminRegisterTab />}
+                {activeTab === 'register' && <AdminRegisterTab currentUser={user} />}
             </div>
         </div>
     )
