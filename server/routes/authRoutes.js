@@ -228,5 +228,16 @@ router.delete('/admins/:id', authMiddleware, async (req, res) => {
         res.json({ success: false, message: err.message })
     }
 })
+// // ⚠️ password reset — কাজ হলে এই route টা মুছে ফেলবেন
+// router.post('/reset-password', async (req, res) => {
+//     try {
+//         const { email, newPassword } = req.body
+//         const hashed = await bcrypt.hash(newPassword, 10)
+//         await User.findOneAndUpdate({ email }, { password: hashed })
+//         res.json({ success: true, message: 'Password reset হয়েছে' })
+//     } catch (err) {
+//         res.json({ success: false, message: err.message })
+//     }
+// })
 
 export default router
