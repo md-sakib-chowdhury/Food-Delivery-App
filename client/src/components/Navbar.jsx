@@ -182,6 +182,7 @@
 // }
 
 // export default Navbar
+import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useCart } from '../context/CartContext'
@@ -190,12 +191,14 @@ const Navbar = () => {
     const { user, logout } = useAuth()
     const { cartItems } = useCart()
     const navigate = useNavigate()
+    const [menuOpen, setMenuOpen] = useState(false)
 
     const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0)
 
     const handleLogout = () => {
         logout()
         navigate('/')
+        setMenuOpen(false)
     }
 
     return (
@@ -213,10 +216,12 @@ const Navbar = () => {
                     box-shadow: 0 1px 12px rgba(0,0,0,0.04);
                 }
 
+                /* ── Large screen: 90vw centred ── */
                 .be-nav-inner {
-                    max-width: 1120px;
+                    width: 90vw;
+                    max-width: 1400px;
                     margin: 0 auto;
-                    padding: 0 1.5rem;
+                    padding: 0;
                     height: 62px;
                     display: flex;
                     align-items: center;
@@ -249,18 +254,13 @@ const Navbar = () => {
                     color: #1c1917;
                     letter-spacing: -0.3px;
                 }
-                .be-logo-text span {
-                    color: #f97316;
-                }
+                .be-logo-text span { color: #f97316; }
 
-                /* Nav links */
+                /* Desktop nav links */
                 .be-links {
                     display: flex;
                     align-items: center;
                     gap: 2px;
-                }
-                @media (max-width: 640px) {
-                    .be-links { display: none; }
                 }
                 .be-link {
                     padding: 7px 14px;
@@ -272,14 +272,8 @@ const Navbar = () => {
                     transition: background 0.15s, color 0.15s;
                     white-space: nowrap;
                 }
-                .be-link:hover {
-                    background: #fff7ed;
-                    color: #f97316;
-                }
-                .be-link.active {
-                    color: #f97316;
-                    background: #fff7ed;
-                }
+                .be-link:hover { background: #fff7ed; color: #f97316; }
+                .be-link.active  { color: #f97316; background: #fff7ed; }
 
                 /* Right side */
                 .be-right {
@@ -306,51 +300,31 @@ const Navbar = () => {
                     transition: background 0.15s, border-color 0.15s;
                     font-family: 'Sora', sans-serif;
                 }
-                .be-cart:hover {
-                    background: #ffedd5;
-                    border-color: #fdba74;
-                }
+                .be-cart:hover { background: #ffedd5; border-color: #fdba74; }
                 .be-cart-icon {
-                    width: 17px;
-                    height: 17px;
-                    stroke: #f97316;
-                    fill: none;
-                    stroke-width: 2;
-                    stroke-linecap: round;
-                    stroke-linejoin: round;
+                    width: 17px; height: 17px;
+                    stroke: #f97316; fill: none;
+                    stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
                     flex-shrink: 0;
                 }
                 .be-cart-badge {
                     position: absolute;
-                    top: -7px;
-                    right: -7px;
-                    background: #f97316;
-                    color: white;
-                    font-size: 10px;
-                    font-weight: 700;
+                    top: -7px; right: -7px;
+                    background: #f97316; color: white;
+                    font-size: 10px; font-weight: 700;
                     border-radius: 50%;
-                    width: 19px;
-                    height: 19px;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
+                    width: 19px; height: 19px;
+                    display: flex; align-items: center; justify-content: center;
                     border: 2px solid white;
                     font-family: 'Sora', sans-serif;
                 }
 
                 /* Divider */
-                .be-divider {
-                    width: 1px;
-                    height: 22px;
-                    background: #e7e5e4;
-                    flex-shrink: 0;
-                }
+                .be-divider { width: 1px; height: 22px; background: #e7e5e4; flex-shrink: 0; }
 
                 /* User button */
                 .be-user-btn {
-                    display: flex;
-                    align-items: center;
-                    gap: 8px;
+                    display: flex; align-items: center; gap: 8px;
                     padding: 5px 11px 5px 5px;
                     border-radius: 10px;
                     border: 1px solid #e7e5e4;
@@ -359,124 +333,164 @@ const Navbar = () => {
                     transition: background 0.15s, border-color 0.15s;
                     cursor: pointer;
                 }
-                .be-user-btn:hover {
-                    background: #fafaf9;
-                    border-color: #d6d3d1;
-                }
+                .be-user-btn:hover { background: #fafaf9; border-color: #d6d3d1; }
                 .be-avatar {
-                    width: 28px;
-                    height: 28px;
+                    width: 28px; height: 28px;
                     border-radius: 50%;
                     background: linear-gradient(135deg, #fb923c, #ea580c);
-                    color: white;
-                    font-size: 12px;
-                    font-weight: 700;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    font-family: 'Sora', sans-serif;
-                    flex-shrink: 0;
+                    color: white; font-size: 12px; font-weight: 700;
+                    display: flex; align-items: center; justify-content: center;
+                    font-family: 'Sora', sans-serif; flex-shrink: 0;
                 }
                 .be-user-name {
-                    font-size: 13.5px;
-                    font-weight: 500;
-                    color: #1c1917;
+                    font-size: 13.5px; font-weight: 500; color: #1c1917;
                     font-family: 'Sora', sans-serif;
-                }
-                @media (max-width: 768px) {
-                    .be-user-name { display: none; }
                 }
 
                 /* Admin badge */
                 .be-admin {
-                    display: flex;
-                    align-items: center;
-                    gap: 5px;
-                    padding: 7px 12px;
-                    border-radius: 10px;
-                    border: 1px solid #e9d5ff;
-                    background: #faf5ff;
-                    color: #7c3aed;
-                    font-size: 13px;
-                    font-weight: 600;
+                    display: flex; align-items: center; gap: 5px;
+                    padding: 7px 12px; border-radius: 10px;
+                    border: 1px solid #e9d5ff; background: #faf5ff; color: #7c3aed;
+                    font-size: 13px; font-weight: 600;
                     text-decoration: none;
                     transition: background 0.15s;
                     font-family: 'Sora', sans-serif;
                 }
-                .be-admin:hover {
-                    background: #f3e8ff;
-                    border-color: #d8b4fe;
-                }
+                .be-admin:hover { background: #f3e8ff; border-color: #d8b4fe; }
                 .be-admin-icon {
-                    width: 15px;
-                    height: 15px;
-                    stroke: #7c3aed;
-                    fill: none;
-                    stroke-width: 2;
-                    stroke-linecap: round;
-                    stroke-linejoin: round;
+                    width: 15px; height: 15px;
+                    stroke: #7c3aed; fill: none;
+                    stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
                     flex-shrink: 0;
                 }
 
                 /* Logout */
                 .be-logout {
-                    display: flex;
-                    align-items: center;
-                    gap: 5px;
-                    padding: 7px 12px;
-                    border-radius: 10px;
-                    border: 1px solid #e7e5e4;
-                    background: transparent;
-                    color: #78716c;
-                    font-size: 13.5px;
-                    font-weight: 500;
-                    cursor: pointer;
+                    display: flex; align-items: center; gap: 5px;
+                    padding: 7px 12px; border-radius: 10px;
+                    border: 1px solid #e7e5e4; background: transparent; color: #78716c;
+                    font-size: 13.5px; font-weight: 500; cursor: pointer;
                     transition: background 0.15s, color 0.15s, border-color 0.15s;
                     font-family: 'Sora', sans-serif;
                 }
-                .be-logout:hover {
-                    background: #fef2f2;
-                    color: #ef4444;
-                    border-color: #fecaca;
-                }
+                .be-logout:hover { background: #fef2f2; color: #ef4444; border-color: #fecaca; }
                 .be-logout-icon {
-                    width: 15px;
-                    height: 15px;
-                    stroke: currentColor;
-                    fill: none;
-                    stroke-width: 2;
-                    stroke-linecap: round;
-                    stroke-linejoin: round;
+                    width: 15px; height: 15px;
+                    stroke: currentColor; fill: none;
+                    stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
                     flex-shrink: 0;
                 }
 
                 /* Login */
                 .be-login {
-                    padding: 8px 20px;
-                    border-radius: 10px;
-                    background: #f97316;
-                    color: white;
-                    font-size: 13.5px;
-                    font-weight: 700;
-                    border: none;
-                    cursor: pointer;
+                    padding: 8px 20px; border-radius: 10px;
+                    background: #f97316; color: white;
+                    font-size: 13.5px; font-weight: 700; border: none; cursor: pointer;
                     text-decoration: none;
                     transition: background 0.15s, transform 0.1s;
                     font-family: 'Sora', sans-serif;
-                    display: inline-flex;
-                    align-items: center;
+                    display: inline-flex; align-items: center;
                     box-shadow: 0 2px 8px rgba(249,115,22,0.3);
                 }
-                .be-login:hover {
-                    background: #ea580c;
-                    transform: translateY(-1px);
-                    box-shadow: 0 4px 12px rgba(249,115,22,0.35);
+                .be-login:hover { background: #ea580c; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(249,115,22,0.35); }
+                .be-login:active { transform: translateY(0); }
+
+                /* Hamburger (mobile only) */
+                .be-hamburger {
+                    display: none;
+                    background: none; border: none; cursor: pointer;
+                    padding: 6px; border-radius: 8px;
+                    color: #78716c;
+                    transition: background 0.15s;
                 }
-                .be-login:active {
-                    transform: translateY(0);
+                .be-hamburger:hover { background: #f5f5f4; }
+                .be-hamburger svg { width: 22px; height: 22px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; }
+
+                /* Mobile drawer */
+                .be-drawer {
+                    display: none;
+                    flex-direction: column;
+                    background: #ffffff;
+                    border-top: 1px solid #f1f0eb;
+                    padding: 12px 5vw 16px;
+                    gap: 4px;
+                }
+                .be-drawer.open { display: flex; }
+                .be-drawer-link {
+                    padding: 11px 14px;
+                    border-radius: 10px;
+                    font-size: 14px; font-weight: 500; color: #44403c;
+                    text-decoration: none;
+                    transition: background 0.15s, color 0.15s;
+                    display: flex; align-items: center; gap: 10px;
+                }
+                .be-drawer-link:hover { background: #fff7ed; color: #f97316; }
+                .be-drawer-link svg { width: 17px; height: 17px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
+                .be-drawer-sep { height: 1px; background: #f1f0eb; margin: 6px 0; }
+                .be-drawer-logout {
+                    padding: 11px 14px; border-radius: 10px;
+                    font-size: 14px; font-weight: 500; color: #78716c;
+                    background: none; border: none; cursor: pointer;
+                    display: flex; align-items: center; gap: 10px;
+                    width: 100%; text-align: left;
+                    transition: background 0.15s, color 0.15s;
+                    font-family: 'Sora', sans-serif;
+                }
+                .be-drawer-logout:hover { background: #fef2f2; color: #ef4444; }
+                .be-drawer-user {
+                    display: flex; align-items: center; gap: 10px;
+                    padding: 10px 14px 14px;
+                }
+                .be-drawer-avatar {
+                    width: 36px; height: 36px; border-radius: 50%;
+                    background: linear-gradient(135deg, #fb923c, #ea580c);
+                    color: white; font-size: 14px; font-weight: 700;
+                    display: flex; align-items: center; justify-content: center;
+                    font-family: 'Sora', sans-serif; flex-shrink: 0;
+                }
+                .be-drawer-uinfo { display: flex; flex-direction: column; gap: 1px; }
+                .be-drawer-uname { font-size: 14px; font-weight: 600; color: #1c1917; }
+                .be-drawer-urole { font-size: 12px; color: #a8a29e; }
+
+                /* ── Responsive breakpoints ── */
+
+                /* Tablet: 768px – 1024px → 95vw, hide user name */
+                @media (max-width: 1024px) {
+                    .be-nav-inner { width: 95vw; }
+                    .be-user-name { display: none; }
+                }
+
+                /* Small tablet / large phone: ≤768px → full width padding, hide desktop links */
+                @media (max-width: 768px) {
+                    .be-nav-inner { width: 100%; padding: 0 4vw; }
+                    .be-links { display: none; }
+                    .be-divider { display: none; }
+                    .be-user-btn { display: none; }
+                    .be-admin { display: none; }
+                    .be-logout { display: none; }
+                    .be-hamburger { display: flex; }
+                    .be-drawer { display: none; }
+                    .be-drawer.open { display: flex; }
+                }
+
+                /* Phone: ≤480px */
+                @media (max-width: 480px) {
+                    .be-nav-inner { padding: 0 3vw; height: 56px; }
+                    .be-logo-text { font-size: 17px; }
+                    .be-logo-icon { width: 32px; height: 32px; font-size: 16px; border-radius: 8px; }
+                    .be-cart { padding: 7px 10px; font-size: 0; gap: 0; }
+                    .be-cart-icon { width: 19px; height: 19px; }
+                }
+
+                /* Very small: ≤360px */
+                @media (max-width: 360px) {
+                    .be-nav-inner { padding: 0 12px; }
+                    .be-logo-text { display: none; }
                 }
             `}</style>
 
+            {/* ── Main Navbar ── */}
             <nav className="be-nav">
                 <div className="be-nav-inner">
 
@@ -488,13 +502,11 @@ const Navbar = () => {
                         </span>
                     </Link>
 
-                    {/* Nav Links */}
+                    {/* Desktop Nav Links */}
                     <div className="be-links">
                         <Link to="/" className="be-link">Home</Link>
                         <Link to="/menu" className="be-link">Menu</Link>
-                        {user && (
-                            <Link to="/orders" className="be-link">My Orders</Link>
-                        )}
+                        {user && <Link to="/orders" className="be-link">My Orders</Link>}
                     </div>
 
                     {/* Right Side */}
@@ -502,7 +514,7 @@ const Navbar = () => {
 
                         {/* Cart */}
                         <Link to="/cart" className="be-cart">
-                            <svg className="be-cart-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <svg className="be-cart-icon" viewBox="0 0 24 24">
                                 <path d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
                             </svg>
                             Cart
@@ -511,42 +523,106 @@ const Navbar = () => {
                             )}
                         </Link>
 
+                        {/* Desktop: divider + user controls */}
                         <div className="be-divider" />
 
                         {user ? (
                             <>
-                                {/* User Profile */}
                                 <Link to="/profile" className="be-user-btn">
-                                    <div className="be-avatar">
-                                        {user.name?.charAt(0).toUpperCase()}
-                                    </div>
+                                    <div className="be-avatar">{user.name?.charAt(0).toUpperCase()}</div>
                                     <span className="be-user-name">{user.name}</span>
                                 </Link>
 
-                                {/* Admin Badge */}
                                 {user.role === 'admin' && (
                                     <Link to="/admin" className="be-admin">
-                                        <svg className="be-admin-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <svg className="be-admin-icon" viewBox="0 0 24 24">
                                             <path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                                         </svg>
                                         Admin
                                     </Link>
                                 )}
 
-                                {/* Logout */}
                                 <button className="be-logout" onClick={handleLogout}>
-                                    <svg className="be-logout-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <svg className="be-logout-icon" viewBox="0 0 24 24">
                                         <path d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                                     </svg>
                                     Logout
                                 </button>
                             </>
                         ) : (
-                            <Link to="/login" className="be-login">
-                                Login
-                            </Link>
+                            <Link to="/login" className="be-login">Login</Link>
                         )}
+
+                        {/* Hamburger (mobile only) */}
+                        <button
+                            className="be-hamburger"
+                            onClick={() => setMenuOpen(o => !o)}
+                            aria-label="Toggle menu"
+                        >
+                            {menuOpen ? (
+                                <svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12" /></svg>
+                            ) : (
+                                <svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16" /></svg>
+                            )}
+                        </button>
                     </div>
+                </div>
+
+                {/* ── Mobile Drawer ── */}
+                <div className={`be-drawer${menuOpen ? ' open' : ''}`}>
+
+                    {/* User info strip */}
+                    {user && (
+                        <>
+                            <div className="be-drawer-user">
+                                <div className="be-drawer-avatar">{user.name?.charAt(0).toUpperCase()}</div>
+                                <div className="be-drawer-uinfo">
+                                    <span className="be-drawer-uname">{user.name}</span>
+                                    <span className="be-drawer-urole">{user.role === 'admin' ? '⚙ Admin' : 'Member'}</span>
+                                </div>
+                            </div>
+                            <div className="be-drawer-sep" />
+                        </>
+                    )}
+
+                    {/* Nav links */}
+                    <Link to="/" className="be-drawer-link" onClick={() => setMenuOpen(false)}>
+                        <svg viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H4a1 1 0 01-1-1V9.5z" /><path d="M9 21V12h6v9" /></svg>
+                        Home
+                    </Link>
+                    <Link to="/menu" className="be-drawer-link" onClick={() => setMenuOpen(false)}>
+                        <svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10" /></svg>
+                        Menu
+                    </Link>
+                    {user && (
+                        <Link to="/orders" className="be-drawer-link" onClick={() => setMenuOpen(false)}>
+                            <svg viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" /></svg>
+                            My Orders
+                        </Link>
+                    )}
+                    {user?.role === 'admin' && (
+                        <Link to="/admin" className="be-drawer-link" onClick={() => setMenuOpen(false)} style={{ color: '#7c3aed' }}>
+                            <svg viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
+                            Admin Panel
+                        </Link>
+                    )}
+
+                    <div className="be-drawer-sep" />
+
+                    {/* Auth */}
+                    {user ? (
+                        <button className="be-drawer-logout" onClick={handleLogout}>
+                            <svg style={{ width: 17, height: 17, stroke: 'currentColor', fill: 'none', strokeWidth: 2, strokeLinecap: 'round', strokeLinejoin: 'round' }} viewBox="0 0 24 24">
+                                <path d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                            </svg>
+                            Logout
+                        </button>
+                    ) : (
+                        <Link to="/login" className="be-drawer-link" onClick={() => setMenuOpen(false)} style={{ color: '#f97316', fontWeight: 600 }}>
+                            <svg viewBox="0 0 24 24"><path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4M10 17l5-5-5-5M15 12H3" /></svg>
+                            Login
+                        </Link>
+                    )}
                 </div>
             </nav>
         </>
