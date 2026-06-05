@@ -806,6 +806,491 @@
 // }
 
 // export default Home
+
+// import { useState, useEffect } from 'react'
+// import { Link } from 'react-router-dom'
+// import { getFoods, getActiveCoupons } from '../services/api'
+// import { useCart } from '../context/CartContext'
+
+// const HERO_BG = 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=1400&auto=format&fit=crop&q=85'
+
+// const OffersSection = () => {
+//     const [coupons, setCoupons] = useState([])
+//     useEffect(() => {
+//         getActiveCoupons().then(res => {
+//             if (res.data.success) setCoupons(res.data.coupons)
+//         })
+//     }, [])
+//     if (coupons.length === 0) return null
+//     return (
+//         <div className="px-4 pb-12 max-w-6xl mx-auto">
+//             <h2 className="text-2xl font-bold text-gray-800 mb-6">🎟️ Current Offers</h2>
+//             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+//                 {coupons.map(c => (
+//                     <div key={c.code} className="relative overflow-hidden rounded-2xl p-6 flex items-center justify-between" style={{ background: '#FF5C00' }}>
+//                         <div className="absolute top-0 right-0 w-28 h-28 rounded-full opacity-10 bg-white -mr-10 -mt-10 pointer-events-none" />
+//                         <div className="absolute bottom-0 left-0 w-16 h-16 rounded-full opacity-10 bg-white -ml-6 -mb-6 pointer-events-none" />
+//                         <div className="relative">
+//                             <div className="text-3xl font-bold text-white">
+//                                 {c.type === 'percent' ? `${c.discount}% OFF` : `৳${c.discount} OFF`}
+//                             </div>
+//                             <p className="text-sm mt-1" style={{ color: 'rgba(255,255,255,0.75)' }}>
+//                                 {c.minOrder > 0 ? `সর্বনিম্ন ৳${c.minOrder} এর order এ` : 'যেকোনো order এ'}
+//                             </p>
+//                         </div>
+//                         <div className="relative flex items-center gap-3">
+//                             <div className="text-white font-bold tracking-widest text-sm px-4 py-2 rounded-lg" style={{ background: 'rgba(255,255,255,0.18)', border: '1.5px dashed rgba(255,255,255,0.5)' }}>
+//                                 {c.code}
+//                             </div>
+//                             <button onClick={() => { navigator.clipboard.writeText(c.code); alert(`"${c.code}" copied! 🎉`) }} className="font-bold text-sm px-4 py-2 rounded-lg transition" style={{ background: '#fff', color: '#FF5C00' }}>
+//                                 Copy
+//                             </button>
+//                         </div>
+//                     </div>
+//                 ))}
+//             </div>
+//         </div>
+//     )
+// }
+
+// const FlashDealBanner = () => {
+//     const [time, setTime] = useState(5 * 3600 + 59 * 60 + 59)
+//     const [flipping, setFlipping] = useState({ h: false, m: false, s: false })
+//     const [voicePlayed, setVoicePlayed] = useState(false)
+
+//     const playVoice = () => {
+//         setVoicePlayed(true)
+//         window.speechSynthesis.cancel()
+//         const makeUtter = (text, pitch, rate) => {
+//             const utter = new SpeechSynthesisUtterance(text)
+//             utter.lang = 'en-US'; utter.pitch = pitch; utter.rate = rate; utter.volume = 1
+//             return utter
+//         }
+//         const msg1 = makeUtter('Khuda lagle BanglaEats e order koro! Ajker flash deal e trish percent chhad paccho!', 1.95, 1.25)
+//         const msg2 = makeUtter('Hey! Order now on BanglaEats and get thirty percent off! Limited time only, hurry up!', 1.85, 1.35)
+//         msg1.onend = () => window.speechSynthesis.speak(msg2)
+//         window.speechSynthesis.speak(msg1)
+//     }
+
+//     useEffect(() => {
+//         const interval = setInterval(() => {
+//             setTime(prev => {
+//                 const next = prev <= 0 ? 5 * 3600 + 59 * 60 + 59 : prev - 1
+//                 const ph = Math.floor(prev / 3600), pm = Math.floor((prev % 3600) / 60), ps = prev % 60
+//                 const nh = Math.floor(next / 3600), nm = Math.floor((next % 3600) / 60), ns = next % 60
+//                 setFlipping({ h: ph !== nh, m: pm !== nm, s: ps !== ns })
+//                 return next
+//             })
+//         }, 1000)
+//         return () => clearInterval(interval)
+//     }, [])
+
+//     const h = Math.floor(time / 3600), m = Math.floor((time % 3600) / 60), s = time % 60
+//     const pad = n => String(n).padStart(2, '0')
+
+//     const TimeBlock = ({ val, label, flip }) => (
+//         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+//             <div style={{ background: '#1e1e1e', border: '0.5px solid #333', borderRadius: 10, width: 56, height: 56, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 26, fontWeight: 800, color: flip ? '#FF5C00' : '#fff', transition: 'color 0.15s' }}>
+//                 {pad(val)}
+//             </div>
+//             <div style={{ fontSize: 10, color: '#555', marginTop: 5, letterSpacing: '0.08em', textTransform: 'uppercase', fontWeight: 600 }}>{label}</div>
+//         </div>
+//     )
+
+//     return (
+//         <div style={{ background: '#111', position: 'relative', overflow: 'hidden' }}>
+//             <style>{`
+//                 @keyframes be-marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+//                 @keyframes be-bounce { from { transform: translateY(0) scale(1); } to { transform: translateY(-6px) scale(1.1); } }
+//                 @keyframes be-pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.25; } }
+//                 @keyframes be-glow { 0%,100% { box-shadow: 0 0 0 0 rgba(255,92,0,0); } 50% { box-shadow: 0 0 20px 6px rgba(255,92,0,0.4); } }
+//                 @keyframes be-shine { 0% { left: -100%; } 60%,100% { left: 160%; } }
+//                 @keyframes be-wave1 { 0%,100% { opacity: 0.3; transform: scale(1); } 50% { opacity: 1; transform: scale(1.3); } }
+//                 @keyframes be-wave2 { 0%,100% { opacity: 0.2; transform: scale(1); } 50% { opacity: 0.8; transform: scale(1.6); } }
+//                 @keyframes be-wave3 { 0%,100% { opacity: 0.1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(2); } }
+//                 @keyframes be-speaker-pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.12); } }
+//                 .be-shine { position: absolute; top: 0; left: -100%; width: 60%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.04), transparent); animation: be-shine 5s ease-in-out infinite; pointer-events: none; }
+//                 .be-fire { display: inline-block; animation: be-bounce 0.7s ease-in-out infinite alternate; }
+//                 .be-sep { font-size: 24px; font-weight: 800; color: #FF5C00; margin-bottom: 18px; animation: be-pulse 1s ease-in-out infinite; }
+//                 .be-badge { background: #FF5C00; color: #fff; font-size: 28px; font-weight: 900; padding: 8px 20px; border-radius: 12px; animation: be-glow 2s ease-in-out infinite; }
+//                 .be-cta { background: #fff; color: #111; font-size: 14px; font-weight: 700; padding: 12px 28px; border-radius: 99px; display: inline-block; transition: transform 0.15s; text-decoration: none; }
+//                 .be-cta:hover { background: #FFD166 !important; transform: scale(1.03); }
+//                 .be-speaker-inner { transition: all 0.3s ease; }
+//                 .be-speaker-btn:hover .be-speaker-inner { transform: scale(1.08); }
+//             `}</style>
+//             <div className="be-shine" />
+//             <div style={{ background: '#FF5C00', padding: '8px 0', overflow: 'hidden', whiteSpace: 'nowrap' }}>
+//                 <div style={{ display: 'inline-block', animation: 'be-marquee 18s linear infinite', fontSize: 12, fontWeight: 600, color: '#fff', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+//                     {Array(2).fill('⚡ Flash Deal চলছে \u00a0•\u00a0 আজকেই Order করো \u00a0•\u00a0 ৩০ মিনিটে ডেলিভারি \u00a0•\u00a0 সীমিত সময়ের অফার \u00a0•\u00a0 এখনই সুযোগ নাও \u00a0•\u00a0 ').join('')}
+//                 </div>
+//             </div>
+//             <div className="max-w-6xl mx-auto px-6" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 24, padding: '28px 24px', flexWrap: 'wrap' }}>
+//                 <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+//                     <span className="be-fire" style={{ fontSize: 36 }}>🔥</span>
+//                     <div>
+//                         <div style={{ fontSize: 11, fontWeight: 700, color: '#FF5C00', letterSpacing: '0.15em', textTransform: 'uppercase', marginBottom: 4 }}>⚡ Limited Time Offer</div>
+//                         <div style={{ fontSize: 22, fontWeight: 800, color: '#fff', lineHeight: 1.2 }}>আজকের Flash Deal!</div>
+//                         <div style={{ fontSize: 13, color: '#888', marginTop: 4 }}>যেকোনো order এ বিশাল ছাড় — সময় শেষ হওয়ার আগেই নাও</div>
+//                     </div>
+//                 </div>
+//                 <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+//                     <TimeBlock val={h} label="ঘণ্টা" flip={flipping.h} />
+//                     <span className="be-sep">:</span>
+//                     <TimeBlock val={m} label="মিনিট" flip={flipping.m} />
+//                     <span className="be-sep">:</span>
+//                     <TimeBlock val={s} label="সেকেন্ড" flip={flipping.s} />
+//                 </div>
+//                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 10 }}>
+//                     <div className="be-badge">30% OFF</div>
+//                     <Link to="/menu" className="be-cta">এখনই Order করো →</Link>
+//                     <button onClick={playVoice} className="be-speaker-btn" style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>
+//                         <div style={{ position: 'relative', width: 64, height: 64, animation: voicePlayed ? 'be-speaker-pulse 0.8s ease-in-out infinite' : 'none' }}>
+//                             {voicePlayed && <>
+//                                 <div style={{ position: 'absolute', inset: 0, borderRadius: '50%', border: '2px solid #FF5C00', animation: 'be-wave1 1.2s ease-in-out infinite' }} />
+//                                 <div style={{ position: 'absolute', inset: -10, borderRadius: '50%', border: '2px solid #FF5C00', animation: 'be-wave2 1.2s ease-in-out infinite 0.2s' }} />
+//                                 <div style={{ position: 'absolute', inset: -20, borderRadius: '50%', border: '2px solid #FF5C00', animation: 'be-wave3 1.2s ease-in-out infinite 0.4s' }} />
+//                             </>}
+//                             <div className="be-speaker-inner" style={{ position: 'relative', zIndex: 2, width: 64, height: 64, borderRadius: '50%', background: voicePlayed ? 'linear-gradient(145deg, #FF5C00, #ff8c00)' : 'linear-gradient(145deg, #2a2a2a, #1a1a1a)', boxShadow: voicePlayed ? '0 8px 32px rgba(255,92,0,0.5), inset 0 2px 4px rgba(255,255,255,0.15)' : '0 8px 24px rgba(0,0,0,0.5), inset 0 2px 4px rgba(255,255,255,0.08)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+//                                 <span style={{ fontSize: 26, lineHeight: 1, filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))' }}>{voicePlayed ? '🔊' : '🔇'}</span>
+//                                 <span style={{ fontSize: 8, fontWeight: 700, marginTop: 3, color: voicePlayed ? 'rgba(255,255,255,0.9)' : 'rgba(255,255,255,0.4)', textTransform: 'uppercase' }}>{voicePlayed ? 'Playing' : 'Tap'}</span>
+//                             </div>
+//                         </div>
+//                     </button>
+//                 </div>
+//             </div>
+//         </div>
+//     )
+// }
+
+// const HowItWorks = () => {
+//     const steps = [
+//         { step: '01', icon: '🍔', title: 'খাবার বেছে নাও', desc: 'Menu থেকে তোমার পছন্দের খাবার select করো এবং cart এ add করো।' },
+//         { step: '02', icon: '💳', title: 'Payment করো', desc: 'bKash, Card বা Cash on Delivery — যেকোনো সহজ উপায়ে payment করো।' },
+//         { step: '03', icon: '🛵', title: 'ডেলিভারি পাও', desc: 'মাত্র ৩০ মিনিটের মধ্যে গরম খাবার তোমার দরজায় পৌঁছে যাবে।' },
+//     ]
+//     return (
+//         <div className="py-16 px-4" style={{ background: '#fff' }}>
+//             <div className="max-w-6xl mx-auto">
+//                 <div className="text-center mb-12">
+//                     <span className="inline-block text-sm font-medium px-4 py-1 rounded-full mb-3" style={{ background: '#FFF0E5', color: '#FF5C00' }}>মাত্র ৩টি ধাপ</span>
+//                     <h2 className="text-3xl font-bold text-gray-800">কীভাবে কাজ করে?</h2>
+//                 </div>
+//                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8 relative">
+//                     <div className="hidden md:block absolute top-12 left-1/4 right-1/4 h-0.5" style={{ background: 'linear-gradient(to right, #FF5C00, #FFD166)' }} />
+//                     {steps.map((s, i) => (
+//                         <div key={i} className="flex flex-col items-center text-center relative">
+//                             <div className="w-24 h-24 rounded-full flex items-center justify-center mb-6 relative z-10" style={{ background: '#FFF0E5', border: '3px solid #FF5C00' }}>
+//                                 <span style={{ fontSize: 38 }}>{s.icon}</span>
+//                                 <div className="absolute -top-1 -right-1 w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold text-white" style={{ background: '#FF5C00' }}>{s.step}</div>
+//                             </div>
+//                             <h3 className="text-lg font-bold text-gray-800 mb-2">{s.title}</h3>
+//                             <p className="text-gray-400 text-sm leading-relaxed max-w-xs">{s.desc}</p>
+//                             {i < steps.length - 1 && <div className="md:hidden text-2xl my-4" style={{ color: '#FF5C00' }}>↓</div>}
+//                         </div>
+//                     ))}
+//                 </div>
+//                 <div className="text-center mt-12">
+//                     <Link to="/menu" className="inline-block px-10 py-4 rounded-full font-bold text-lg text-white transition hover:opacity-90" style={{ background: '#FF5C00' }}>এখনই শুরু করো →</Link>
+//                 </div>
+//             </div>
+//         </div>
+//     )
+// }
+
+// /* ── Mascot Character ── */
+// const Mascot = () => {
+//     const [visible, setVisible] = useState(false)
+//     const [talking, setTalking] = useState(false)
+//     const [mouthOpen, setMouthOpen] = useState(false)
+
+//     const speak = () => {
+//         setTalking(true)
+//         setMouthOpen(true)
+//         window.speechSynthesis.cancel()
+//         const makeUtter = (text, pitch, rate) => {
+//             const utter = new SpeechSynthesisUtterance(text)
+//             utter.lang = 'en-US'; utter.pitch = pitch; utter.rate = rate; utter.volume = 1
+//             return utter
+//         }
+//         const msg1 = makeUtter('Khuda lagle BanglaEats e order koro! Ajker flash deal e trish percent chhad paccho!', 1.95, 1.25)
+//         const msg2 = makeUtter('Hey! Order now on BanglaEats and get thirty percent off! Limited time only, hurry up!', 1.85, 1.35)
+//         msg2.onend = () => { setTalking(false); setMouthOpen(false) }
+//         msg1.onend = () => window.speechSynthesis.speak(msg2)
+//         window.speechSynthesis.speak(msg1)
+
+//         // mouth animation
+//         const mouthInterval = setInterval(() => setMouthOpen(prev => !prev), 300)
+//         setTimeout(() => clearInterval(mouthInterval), 6000)
+//     }
+
+//     useEffect(() => {
+//         // page load হলে ০.৮ সেকেন্ড পরে appear করবে
+//         const showTimer = setTimeout(() => {
+//             setVisible(true)
+//             // appear হওয়ার পরে voice play করবে
+//             const voiceTimer = setTimeout(() => speak(), 600)
+//             return () => clearTimeout(voiceTimer)
+//         }, 800)
+
+//         return () => {
+//             clearTimeout(showTimer)
+//             window.speechSynthesis.cancel()
+//         }
+//     }, [])
+
+//     if (!visible) return null
+
+//     return (
+//         <>
+//             <style>{`
+//                 @keyframes mascot-float { 0%,100% { transform: translateY(0px); } 50% { transform: translateY(-8px); } }
+//                 @keyframes mascot-appear { from { transform: translateY(100px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+//                 @keyframes mascot-wave { 0%,100% { transform: rotate(0deg); } 25% { transform: rotate(-20deg); } 75% { transform: rotate(20deg); } }
+//                 @keyframes bubble-appear { from { transform: scale(0); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+//                 @keyframes mascot-talk { 0%,100% { transform: scaleY(1); } 50% { transform: scaleY(0.3); } }
+//             `}</style>
+
+//             <div style={{ position: 'fixed', bottom: 20, right: 20, zIndex: 9999, display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 8, animation: 'mascot-appear 0.5s ease-out' }}>
+
+//                 {/* Speech Bubble */}
+//                 <div style={{ background: '#fff', borderRadius: 16, padding: '12px 16px', boxShadow: '0 8px 32px rgba(0,0,0,0.15)', maxWidth: 220, fontSize: 13, color: '#333', lineHeight: 1.6, border: '1.5px solid #FFE0CC', position: 'relative', animation: 'bubble-appear 0.4s ease-out 0.3s both' }}>
+//                     🍔 ক্ষুধা লাগছে? আজকের Flash Deal এ <strong style={{ color: '#FF5C00' }}>৩০% OFF</strong> পাচ্ছো! এখনই order করো!
+//                     <div style={{ position: 'absolute', bottom: -10, right: 30, width: 0, height: 0, borderLeft: '10px solid transparent', borderRight: '10px solid transparent', borderTop: '10px solid #fff' }} />
+//                     <button onClick={() => { setVisible(false); window.speechSynthesis.cancel() }} style={{ position: 'absolute', top: -8, right: -8, width: 20, height: 20, borderRadius: '50%', background: '#FF5C00', color: '#fff', border: 'none', cursor: 'pointer', fontSize: 10, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
+//                 </div>
+
+//                 {/* Mascot Body */}
+//                 <div onClick={speak} style={{ cursor: 'pointer', animation: 'mascot-float 3s ease-in-out infinite', userSelect: 'none' }}>
+//                     <svg width="90" height="120" viewBox="0 0 90 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+//                         {/* Body */}
+//                         <ellipse cx="45" cy="85" rx="28" ry="32" fill="#FF5C00" />
+//                         {/* Belly */}
+//                         <ellipse cx="45" cy="88" rx="18" ry="20" fill="#FF8C42" />
+//                         {/* Head */}
+//                         <circle cx="45" cy="38" r="28" fill="#FFDAB9" />
+//                         {/* Hair */}
+//                         <ellipse cx="45" cy="12" rx="22" ry="8" fill="#4A2800" />
+//                         <rect x="23" y="10" width="44" height="10" rx="5" fill="#4A2800" />
+//                         {/* Eyes */}
+//                         <circle cx="35" cy="35" r="5" fill="white" />
+//                         <circle cx="55" cy="35" r="5" fill="white" />
+//                         <circle cx="36" cy="35" r="3" fill="#333" />
+//                         <circle cx="56" cy="35" r="3" fill="#333" />
+//                         <circle cx="37" cy="34" r="1" fill="white" />
+//                         <circle cx="57" cy="34" r="1" fill="white" />
+//                         {/* Eyebrows */}
+//                         <path d="M30 28 Q35 25 40 28" stroke="#4A2800" strokeWidth="2" strokeLinecap="round" fill="none" />
+//                         <path d="M50 28 Q55 25 60 28" stroke="#4A2800" strokeWidth="2" strokeLinecap="round" fill="none" />
+//                         {/* Nose */}
+//                         <ellipse cx="45" cy="42" rx="3" ry="2" fill="#E8A87C" />
+//                         {/* Mouth */}
+//                         {mouthOpen ? (
+//                             <ellipse cx="45" cy="50" rx="8" ry="5" fill="#CC3300" />
+//                         ) : (
+//                             <path d="M37 50 Q45 57 53 50" stroke="#CC3300" strokeWidth="2.5" strokeLinecap="round" fill="none" />
+//                         )}
+//                         {/* Cheeks */}
+//                         <ellipse cx="30" cy="44" rx="6" ry="4" fill="#FFB6A3" opacity="0.6" />
+//                         <ellipse cx="60" cy="44" rx="6" ry="4" fill="#FFB6A3" opacity="0.6" />
+//                         {/* Left Arm - waving */}
+//                         <ellipse cx="15" cy="80" rx="8" ry="22" fill="#FF5C00" transform="rotate(-20 15 80)" style={{ animation: talking ? 'mascot-wave 0.4s ease-in-out infinite' : 'none', transformOrigin: '15px 65px' }} />
+//                         {/* Right Arm */}
+//                         <ellipse cx="75" cy="80" rx="8" ry="22" fill="#FF5C00" transform="rotate(20 75 80)" />
+//                         {/* Legs */}
+//                         <ellipse cx="35" cy="115" rx="9" ry="12" fill="#CC3300" />
+//                         <ellipse cx="55" cy="115" rx="9" ry="12" fill="#CC3300" />
+//                         {/* Feet */}
+//                         <ellipse cx="33" cy="124" rx="11" ry="6" fill="#4A2800" />
+//                         <ellipse cx="57" cy="124" rx="11" ry="6" fill="#4A2800" />
+//                         {/* Chef Hat */}
+//                         <rect x="28" y="6" width="34" height="14" rx="4" fill="white" />
+//                         <ellipse cx="45" cy="6" rx="16" ry="8" fill="white" />
+//                         <rect x="30" y="14" width="30" height="4" rx="2" fill="#FF5C00" />
+//                         {/* Sound waves when talking */}
+//                         {talking && <>
+//                             <circle cx="75" cy="35" r="8" fill="none" stroke="#FF5C00" strokeWidth="2" opacity="0.6" style={{ animation: 'be-wave1 1s ease-in-out infinite' }} />
+//                             <circle cx="75" cy="35" r="14" fill="none" stroke="#FF5C00" strokeWidth="1.5" opacity="0.3" style={{ animation: 'be-wave2 1s ease-in-out infinite 0.2s' }} />
+//                         </>}
+//                     </svg>
+//                     <div style={{ textAlign: 'center', fontSize: 10, color: '#FF5C00', fontWeight: 700, marginTop: -4 }}>
+//                         {talking ? '🔊 বলছি...' : '👆 Click করো'}
+//                     </div>
+//                 </div>
+//             </div>
+//         </>
+//     )
+// }
+
+// const Home = () => {
+//     const [foods, setFoods] = useState([])
+//     const { addToCart } = useCart()
+
+//     useEffect(() => {
+//         getFoods().then(res => {
+//             if (res.data.success) setFoods(res.data.foods.slice(0, 6))
+//         })
+//     }, [])
+
+//     return (
+//         <div>
+//             {/* Mascot — সব সময় fixed corner এ থাকবে */}
+//             <Mascot />
+
+//             {/* Hero */}
+//             <div className="relative text-white overflow-hidden" style={{ minHeight: 580 }}>
+//                 <img src={HERO_BG} alt="" aria-hidden="true" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center', zIndex: 0 }} />
+//                 <div style={{ position: 'absolute', inset: 0, zIndex: 1, background: 'linear-gradient(110deg, rgba(0,0,0,0.80) 0%, rgba(0,0,0,0.55) 55%, rgba(0,0,0,0.20) 100%)' }} />
+//                 <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 130, zIndex: 2, background: 'linear-gradient(to top, rgba(255,92,0,0.6) 0%, transparent 100%)' }} />
+//                 <div className="relative max-w-6xl mx-auto px-6 flex flex-col justify-center" style={{ zIndex: 3, minHeight: 580, paddingTop: 90, paddingBottom: 110 }}>
+//                     <span className="inline-block text-sm font-medium px-4 py-1 rounded-full mb-6 self-start" style={{ background: 'rgba(255,92,0,0.9)', border: '1px solid rgba(255,255,255,0.2)' }}>⚡ ৩০ মিনিটে ডেলিভারি</span>
+//                     <h1 style={{ fontSize: 'clamp(2.2rem, 4.5vw, 3.5rem)', fontWeight: 800, lineHeight: 1.2, marginBottom: 10 }}>ক্ষুধা লাগলে</h1>
+//                     <div style={{ marginBottom: 14 }}>
+//                         <span style={{ fontSize: 'clamp(2.8rem, 6vw, 5rem)', fontWeight: 900, letterSpacing: '-0.02em', background: 'linear-gradient(90deg, #FF5C00 0%, #FFD166 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text', display: 'inline' }}>BanglaEats</span>
+//                         <span style={{ fontSize: 'clamp(2.2rem, 4.5vw, 3.5rem)', fontWeight: 800, marginLeft: 10, color: '#fff' }}>আছে!</span>
+//                     </div>
+//                     <p style={{ fontSize: 12, letterSpacing: '0.18em', textTransform: 'uppercase', color: '#FFD166', marginBottom: 20, fontWeight: 600, opacity: 0.9 }}>Dhaka's #1 Food Delivery Platform</p>
+//                     <p style={{ fontSize: '1.1rem', color: 'rgba(255,255,255,0.75)', maxWidth: 460, marginBottom: 36, lineHeight: 1.6 }}>Dhaka-তে সেরা রেস্টুরেন্ট থেকে তাজা খাবার, দ্রুত ডেলিভারি</p>
+//                     <div className="flex gap-4 flex-wrap">
+//                         <Link to="/menu" className="px-8 py-3 rounded-full font-bold text-lg transition" style={{ background: '#FF5C00', color: '#fff', boxShadow: '0 4px 24px rgba(255,92,0,0.5)' }}>এখনই Order করো 🍔</Link>
+//                         <Link to="/orders" className="px-8 py-3 rounded-full font-bold text-lg transition" style={{ border: '2px solid rgba(255,255,255,0.45)', color: '#fff', background: 'rgba(255,255,255,0.08)' }}>My Orders</Link>
+//                     </div>
+//                 </div>
+//                 <svg viewBox="0 0 1440 60" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ position: 'absolute', bottom: -1, left: 0, right: 0, zIndex: 4, display: 'block' }}>
+//                     <path d="M0 60L1440 60L1440 30C1440 30 1080 0 720 0C360 0 0 30 0 30L0 60Z" fill="#FFF8F3" />
+//                 </svg>
+//             </div>
+
+//             {/* Stats */}
+//             <div style={{ background: '#FFF8F3', borderBottom: '0.5px solid #FFE0CC' }}>
+//                 <div className="max-w-6xl mx-auto px-4 py-6 grid grid-cols-3 divide-x divide-orange-100 text-center">
+//                     {[{ num: '৫০০+', label: 'খুশি Customer' }, { num: '৩০', label: 'মিনিটে Delivery' }, { num: '১০০+', label: 'Food Item' }].map(s => (
+//                         <div key={s.label}>
+//                             <div className="text-3xl font-bold" style={{ color: '#FF5C00' }}>{s.num}</div>
+//                             <div className="text-sm mt-1 text-gray-400">{s.label}</div>
+//                         </div>
+//                     ))}
+//                 </div>
+//             </div>
+
+//             {/* Categories */}
+//             <div className="max-w-6xl mx-auto px-4 py-12">
+//                 <div className="flex items-center justify-between mb-7">
+//                     <h2 className="text-2xl font-bold text-gray-800">Category বেছে নাও</h2>
+//                     <Link to="/menu" className="text-sm font-medium hover:underline" style={{ color: '#FF5C00' }}>সব দেখো →</Link>
+//                 </div>
+//                 <div className="grid grid-cols-3 md:grid-cols-6 gap-4">
+//                     {[
+//                         { name: 'Burger', icon: '🍔', count: '24 items' },
+//                         { name: 'Pizza', icon: '🍕', count: '18 items' },
+//                         { name: 'Biryani', icon: '🍛', count: '12 items' },
+//                         { name: 'Chicken', icon: '🍗', count: '20 items' },
+//                         { name: 'Dessert', icon: '🍰', count: '15 items' },
+//                         { name: 'Drinks', icon: '🥤', count: '10 items' },
+//                     ].map(cat => (
+//                         <Link to="/menu" key={cat.name} className="group relative flex flex-col items-center rounded-2xl p-5 pb-4 transition hover:-translate-y-1 cursor-pointer overflow-hidden" style={{ border: '0.5px solid #f0e0d6', background: '#fff' }}>
+//                             <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity rounded-2xl" style={{ background: '#FFF5F0' }} />
+//                             <div className="relative z-10 flex items-center justify-center mb-3" style={{ width: 56, height: 56, borderRadius: 16, background: '#FFF0E5', fontSize: 26 }}>{cat.icon}</div>
+//                             <span className="relative z-10 text-sm font-semibold transition-colors group-hover:text-orange-500" style={{ color: '#555' }}>{cat.name}</span>
+//                             <span className="relative z-10 text-xs mt-1" style={{ color: '#bbb' }}>{cat.count}</span>
+//                         </Link>
+//                     ))}
+//                 </div>
+//             </div>
+
+//             <FlashDealBanner />
+//             <HowItWorks />
+
+//             {foods.length > 0 && (
+//                 <div className="max-w-6xl mx-auto px-4 pb-12">
+//                     <div className="flex justify-between items-center mb-6">
+//                         <h2 className="text-2xl font-bold text-gray-800">🔥 Featured Foods</h2>
+//                         <Link to="/menu" className="text-sm font-medium hover:underline" style={{ color: '#FF5C00' }}>সব দেখো →</Link>
+//                     </div>
+//                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+//                         {foods.map(food => (
+//                             <div key={food._id} className="bg-white rounded-2xl overflow-hidden group transition hover:shadow-md" style={{ border: '0.5px solid #f0e0d6' }}>
+//                                 <div className="relative overflow-hidden">
+//                                     <img src={food.image} alt={food.name} className="w-full h-48 object-cover group-hover:scale-105 transition duration-300" />
+//                                     <span className="absolute top-3 left-3 text-white text-xs font-bold px-3 py-1 rounded-full" style={{ background: '#FF5C00' }}>{food.category}</span>
+//                                 </div>
+//                                 <div className="p-4">
+//                                     <h3 className="text-lg font-bold text-gray-800 mb-1">{food.name}</h3>
+//                                     <p className="text-gray-400 text-sm mb-4 line-clamp-2">{food.description}</p>
+//                                     <div className="flex justify-between items-center">
+//                                         <span className="font-bold text-xl" style={{ color: '#FF5C00' }}>৳{food.price}</span>
+//                                         <button onClick={() => addToCart(food)} className="text-white text-sm font-medium px-4 py-2 rounded-full transition hover:opacity-90" style={{ background: '#FF5C00' }}>+ Add to Cart</button>
+//                                     </div>
+//                                 </div>
+//                             </div>
+//                         ))}
+//                     </div>
+//                 </div>
+//             )}
+
+//             <OffersSection />
+
+//             <div style={{ background: '#FFF8F3' }} className="py-16 px-4">
+//                 <div className="max-w-6xl mx-auto">
+//                     <div className="text-center mb-12">
+//                         <span className="inline-block text-xs font-semibold px-4 py-1 rounded-full mb-3 uppercase tracking-widest" style={{ background: '#FFF0E5', color: '#FF5C00' }}>আমাদের সুবিধা</span>
+//                         <h2 className="text-3xl font-bold text-gray-900 mb-2">কেন BanglaEats বেছে নেবে?</h2>
+//                         <p className="text-gray-400 text-sm">Dhaka-তে সবচেয়ে ভালো food delivery experience আমরাই দিই</p>
+//                     </div>
+//                     <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+//                         {[
+//                             { icon: '⚡', title: 'দ্রুত ডেলিভারি', desc: 'মাত্র ৩০ মিনিটে আপনার দরজায় পৌঁছে যাবে।', tag: '⏱ ৩০ min গ্যারান্টি', accent: '#FF5C00', iconBg: '#FFF0E5', tagBg: '#FFF0E5', tagColor: '#FF5C00' },
+//                             { icon: '🍽️', title: 'সেরা মান', desc: 'সেরা রেস্টুরেন্ট থেকে তাজা ও সুস্বাদু খাবার।', tag: '✓ Quality নিশ্চিত', accent: '#1D9E75', iconBg: '#E1F5EE', tagBg: '#E1F5EE', tagColor: '#0F6E56' },
+//                             { icon: '💳', title: 'সহজ পেমেন্ট', desc: 'bKash, Card বা Cash on Delivery।', tag: '🔒 Secure Payment', accent: '#7F77DD', iconBg: '#EEEDFE', tagBg: '#EEEDFE', tagColor: '#534AB7' },
+//                         ].map(f => (
+//                             <div key={f.title} className="bg-white rounded-3xl p-8 relative overflow-hidden text-left" style={{ border: '0.5px solid #f0e0d6' }}>
+//                                 <div className="absolute top-0 left-0 right-0 h-1 rounded-t-3xl" style={{ background: f.accent }} />
+//                                 <div className="flex items-center justify-center mb-5" style={{ width: 64, height: 64, borderRadius: 18, background: f.iconBg, fontSize: 30 }}>{f.icon}</div>
+//                                 <h3 className="text-lg font-bold text-gray-900 mb-2">{f.title}</h3>
+//                                 <p className="text-gray-400 text-sm leading-relaxed mb-5">{f.desc}</p>
+//                                 <span className="inline-block text-xs font-semibold px-3 py-1 rounded-full" style={{ background: f.tagBg, color: f.tagColor }}>{f.tag}</span>
+//                             </div>
+//                         ))}
+//                     </div>
+//                 </div>
+//             </div>
+
+//             <footer style={{ background: '#111111', color: '#aaa' }}>
+//                 <div className="max-w-6xl mx-auto px-6 py-14 grid grid-cols-1 md:grid-cols-4 gap-10">
+//                     <div className="md:col-span-2">
+//                         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
+//                             <span style={{ fontSize: 28 }}>🍔</span>
+//                             <span style={{ fontSize: 24, fontWeight: 900, background: 'linear-gradient(90deg, #FF5C00, #FFD166)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>BanglaEats</span>
+//                         </div>
+//                         <p style={{ fontSize: 14, lineHeight: 1.7, color: '#888', maxWidth: 300, marginBottom: 20 }}>Dhaka-তে সবচেয়ে দ্রুত ও সেরা food delivery platform।</p>
+//                     </div>
+//                     <div>
+//                         <div style={{ fontSize: 13, fontWeight: 700, color: '#fff', marginBottom: 16, textTransform: 'uppercase' }}>Quick Links</div>
+//                         {['Menu', 'My Orders', 'Cart', 'Offers & Coupons'].map(l => (
+//                             <div key={l} style={{ marginBottom: 10 }}>
+//                                 <span style={{ fontSize: 14, color: '#888', cursor: 'pointer' }}>{l}</span>
+//                             </div>
+//                         ))}
+//                     </div>
+//                     <div>
+//                         <div style={{ fontSize: 13, fontWeight: 700, color: '#fff', marginBottom: 16, textTransform: 'uppercase' }}>Contact</div>
+//                         {[{ icon: '📍', text: 'Dhaka, Bangladesh' }, { icon: '📞', text: '+880 1XXX-XXXXXX' }, { icon: '✉️', text: 'hello@banglaeats.com' }].map(c => (
+//                             <div key={c.text} style={{ display: 'flex', gap: 8, marginBottom: 12 }}>
+//                                 <span>{c.icon}</span>
+//                                 <span style={{ fontSize: 13, color: '#777' }}>{c.text}</span>
+//                             </div>
+//                         ))}
+//                     </div>
+//                 </div>
+//                 <div style={{ borderTop: '0.5px solid #222', padding: '20px 24px', textAlign: 'center' }}>
+//                     <p style={{ fontSize: 13, color: '#555' }}>© 2026 BanglaEats. All rights reserved.</p>
+//                 </div>
+//             </footer>
+//         </div>
+//     )
+// }
+
+// export default Home
+
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { getFoods, getActiveCoupons } from '../services/api'
@@ -813,6 +1298,228 @@ import { useCart } from '../context/CartContext'
 
 const HERO_BG = 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=1400&auto=format&fit=crop&q=85'
 
+/* ── Shared responsive container styles ── */
+const containerStyle = {
+    width: '90vw',
+    maxWidth: 1400,
+    margin: '0 auto',
+    padding: '0',
+}
+
+/* ── Global responsive CSS injected once ── */
+const GlobalStyles = () => (
+    <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800;900&display=swap');
+
+        *, *::before, *::after { box-sizing: border-box; }
+
+        .be-container {
+            width: 90vw;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0;
+        }
+
+        /* Tablet */
+        @media (max-width: 1024px) {
+            .be-container { width: 95vw; }
+        }
+        /* Small tablet */
+        @media (max-width: 768px) {
+            .be-container { width: 100%; padding: 0 4vw; }
+        }
+        /* Phone */
+        @media (max-width: 480px) {
+            .be-container { padding: 0 5vw; }
+        }
+        /* Tiny */
+        @media (max-width: 360px) {
+            .be-container { padding: 0 4vw; }
+        }
+
+        /* Grid helpers */
+        .be-grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+        }
+        .be-grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+        .be-grid-6 { display: grid; grid-template-columns: repeat(6, 1fr); gap: 16px; }
+        .be-grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+
+        @media (max-width: 1024px) {
+            .be-grid-4 { grid-template-columns: repeat(2, 1fr); }
+            .be-grid-6 { grid-template-columns: repeat(3, 1fr); }
+        }
+        @media (max-width: 768px) {
+            .be-grid-3 { grid-template-columns: repeat(2, 1fr); gap: 16px; }
+            .be-grid-4 { grid-template-columns: repeat(2, 1fr); }
+            .be-grid-6 { grid-template-columns: repeat(3, 1fr); gap: 10px; }
+            .be-grid-2 { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 480px) {
+            .be-grid-3 { grid-template-columns: 1fr; gap: 14px; }
+            .be-grid-6 { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+        }
+
+        /* Stats row */
+        .be-stats-row { display: grid; grid-template-columns: repeat(3, 1fr); }
+        @media (max-width: 480px) {
+            .be-stats-row { grid-template-columns: 1fr; gap: 0; }
+            .be-stats-row > div { border-right: none !important; border-bottom: 0.5px solid #FFE0CC; }
+            .be-stats-row > div:last-child { border-bottom: none; }
+        }
+
+        /* Flash deal banner */
+        .be-flash-inner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 24px;
+            padding: 28px 0;
+            flex-wrap: wrap;
+        }
+        @media (max-width: 900px) {
+            .be-flash-inner {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+                gap: 20px;
+                padding: 24px 0;
+            }
+        }
+        @media (max-width: 480px) {
+            .be-flash-inner { padding: 20px 0; gap: 16px; }
+        }
+
+        /* Hero */
+        .be-hero-content {
+            position: relative;
+            z-index: 3;
+            min-height: 580px;
+            padding: 90px 0 110px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        @media (max-width: 768px) {
+            .be-hero-content { min-height: 480px; padding: 80px 0 90px; }
+        }
+        @media (max-width: 480px) {
+            .be-hero-content { min-height: 400px; padding: 70px 0 80px; }
+        }
+
+        .be-hero-btns {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+        @media (max-width: 400px) {
+            .be-hero-btns { flex-direction: column; }
+            .be-hero-btns a { text-align: center; }
+        }
+
+        /* Footer grid */
+        .be-footer-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            gap: 40px;
+            padding: 56px 0;
+        }
+        @media (max-width: 768px) {
+            .be-footer-grid { grid-template-columns: 1fr 1fr; gap: 28px; padding: 40px 0; }
+        }
+        @media (max-width: 480px) {
+            .be-footer-grid { grid-template-columns: 1fr; gap: 24px; padding: 32px 0; }
+        }
+
+        /* Why us cards */
+        .be-why-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+        @media (max-width: 768px) {
+            .be-why-grid { grid-template-columns: 1fr; gap: 16px; }
+        }
+
+        /* Offers grid */
+        .be-offers-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+        }
+        @media (max-width: 900px) {
+            .be-offers-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 560px) {
+            .be-offers-grid { grid-template-columns: 1fr; }
+        }
+
+        /* HowItWorks connector line */
+        .be-hiw-line {
+            display: block;
+            position: absolute;
+            top: 48px;
+            left: 25%;
+            right: 25%;
+            height: 2px;
+            background: linear-gradient(to right, #FF5C00, #FFD166);
+        }
+        @media (max-width: 768px) {
+            .be-hiw-line { display: none; }
+        }
+
+        /* HowItWorks grid */
+        .be-hiw-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 32px;
+            position: relative;
+        }
+        @media (max-width: 640px) {
+            .be-hiw-grid { grid-template-columns: 1fr; gap: 24px; }
+        }
+
+        /* Category cards hover */
+        .be-cat-card { transition: transform 0.2s; }
+        .be-cat-card:hover { transform: translateY(-4px); }
+
+        /* Food card */
+        .be-food-card { transition: box-shadow 0.2s; }
+        .be-food-card:hover { box-shadow: 0 8px 32px rgba(255,92,0,0.12); }
+        .be-food-img { transition: transform 0.3s; }
+        .be-food-card:hover .be-food-img { transform: scale(1.05); }
+
+        /* Mascot */
+        @keyframes mascot-float { 0%,100% { transform: translateY(0px); } 50% { transform: translateY(-8px); } }
+        @keyframes mascot-appear { from { transform: translateY(100px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes mascot-wave { 0%,100% { transform: rotate(0deg); } 25% { transform: rotate(-20deg); } 75% { transform: rotate(20deg); } }
+        @keyframes bubble-appear { from { transform: scale(0); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        @keyframes be-marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+        @keyframes be-bounce { from { transform: translateY(0) scale(1); } to { transform: translateY(-6px) scale(1.1); } }
+        @keyframes be-pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.25; } }
+        @keyframes be-glow { 0%,100% { box-shadow: 0 0 0 0 rgba(255,92,0,0); } 50% { box-shadow: 0 0 20px 6px rgba(255,92,0,0.4); } }
+        @keyframes be-shine { 0% { left: -100%; } 60%,100% { left: 160%; } }
+        @keyframes be-wave1 { 0%,100% { opacity: 0.3; transform: scale(1); } 50% { opacity: 1; transform: scale(1.3); } }
+        @keyframes be-wave2 { 0%,100% { opacity: 0.2; transform: scale(1); } 50% { opacity: 0.8; transform: scale(1.6); } }
+        @keyframes be-wave3 { 0%,100% { opacity: 0.1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(2); } }
+        @keyframes be-speaker-pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.12); } }
+
+        .be-shine { position: absolute; top: 0; left: -100%; width: 60%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.04), transparent); animation: be-shine 5s ease-in-out infinite; pointer-events: none; }
+        .be-fire { display: inline-block; animation: be-bounce 0.7s ease-in-out infinite alternate; }
+        .be-sep { font-size: 24px; font-weight: 800; color: #FF5C00; margin-bottom: 18px; animation: be-pulse 1s ease-in-out infinite; }
+        .be-badge { background: #FF5C00; color: #fff; font-size: 28px; font-weight: 900; padding: 8px 20px; border-radius: 12px; animation: be-glow 2s ease-in-out infinite; }
+        .be-cta { background: #fff; color: #111; font-size: 14px; font-weight: 700; padding: 12px 28px; border-radius: 99px; display: inline-block; transition: transform 0.15s; text-decoration: none; }
+        .be-cta:hover { background: #FFD166 !important; transform: scale(1.03); }
+
+        @media (max-width: 480px) {
+            .be-mascot { display: none; }
+        }
+    `}</style>
+)
+
+/* ── Offers Section ── */
 const OffersSection = () => {
     const [coupons, setCoupons] = useState([])
     useEffect(() => {
@@ -821,37 +1528,44 @@ const OffersSection = () => {
         })
     }, [])
     if (coupons.length === 0) return null
+
     return (
-        <div className="px-4 pb-12 max-w-6xl mx-auto">
-            <h2 className="text-2xl font-bold text-gray-800 mb-6">🎟️ Current Offers</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {coupons.map(c => (
-                    <div key={c.code} className="relative overflow-hidden rounded-2xl p-6 flex items-center justify-between" style={{ background: '#FF5C00' }}>
-                        <div className="absolute top-0 right-0 w-28 h-28 rounded-full opacity-10 bg-white -mr-10 -mt-10 pointer-events-none" />
-                        <div className="absolute bottom-0 left-0 w-16 h-16 rounded-full opacity-10 bg-white -ml-6 -mb-6 pointer-events-none" />
-                        <div className="relative">
-                            <div className="text-3xl font-bold text-white">
-                                {c.type === 'percent' ? `${c.discount}% OFF` : `৳${c.discount} OFF`}
+        <div style={{ paddingBottom: 48 }}>
+            <div className="be-container">
+                <h2 style={{ fontSize: 22, fontWeight: 700, color: '#1c1917', marginBottom: 24 }}>🎟️ Current Offers</h2>
+                <div className="be-offers-grid">
+                    {coupons.map(c => (
+                        <div key={c.code} style={{ position: 'relative', overflow: 'hidden', borderRadius: 20, padding: '20px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#FF5C00', flexWrap: 'wrap', gap: 12 }}>
+                            <div style={{ position: 'absolute', top: 0, right: 0, width: 112, height: 112, borderRadius: '50%', opacity: 0.1, background: 'white', marginRight: -40, marginTop: -40, pointerEvents: 'none' }} />
+                            <div style={{ position: 'absolute', bottom: 0, left: 0, width: 64, height: 64, borderRadius: '50%', opacity: 0.1, background: 'white', marginLeft: -24, marginBottom: -24, pointerEvents: 'none' }} />
+                            <div style={{ position: 'relative' }}>
+                                <div style={{ fontSize: 28, fontWeight: 900, color: 'white' }}>
+                                    {c.type === 'percent' ? `${c.discount}% OFF` : `৳${c.discount} OFF`}
+                                </div>
+                                <p style={{ fontSize: 13, marginTop: 4, color: 'rgba(255,255,255,0.75)' }}>
+                                    {c.minOrder > 0 ? `সর্বনিম্ন ৳${c.minOrder} এর order এ` : 'যেকোনো order এ'}
+                                </p>
                             </div>
-                            <p className="text-sm mt-1" style={{ color: 'rgba(255,255,255,0.75)' }}>
-                                {c.minOrder > 0 ? `সর্বনিম্ন ৳${c.minOrder} এর order এ` : 'যেকোনো order এ'}
-                            </p>
-                        </div>
-                        <div className="relative flex items-center gap-3">
-                            <div className="text-white font-bold tracking-widest text-sm px-4 py-2 rounded-lg" style={{ background: 'rgba(255,255,255,0.18)', border: '1.5px dashed rgba(255,255,255,0.5)' }}>
-                                {c.code}
+                            <div style={{ position: 'relative', display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
+                                <div style={{ color: 'white', fontWeight: 700, letterSpacing: '0.1em', fontSize: 13, padding: '8px 14px', borderRadius: 8, background: 'rgba(255,255,255,0.18)', border: '1.5px dashed rgba(255,255,255,0.5)' }}>
+                                    {c.code}
+                                </div>
+                                <button
+                                    onClick={() => { navigator.clipboard.writeText(c.code); alert(`"${c.code}" copied! 🎉`) }}
+                                    style={{ fontWeight: 700, fontSize: 13, padding: '8px 14px', borderRadius: 8, background: '#fff', color: '#FF5C00', border: 'none', cursor: 'pointer' }}
+                                >
+                                    Copy
+                                </button>
                             </div>
-                            <button onClick={() => { navigator.clipboard.writeText(c.code); alert(`"${c.code}" copied! 🎉`) }} className="font-bold text-sm px-4 py-2 rounded-lg transition" style={{ background: '#fff', color: '#FF5C00' }}>
-                                Copy
-                            </button>
                         </div>
-                    </div>
-                ))}
+                    ))}
+                </div>
             </div>
         </div>
     )
 }
 
+/* ── Flash Deal Banner ── */
 const FlashDealBanner = () => {
     const [time, setTime] = useState(5 * 3600 + 59 * 60 + 59)
     const [flipping, setFlipping] = useState({ h: false, m: false, s: false })
@@ -861,9 +1575,9 @@ const FlashDealBanner = () => {
         setVoicePlayed(true)
         window.speechSynthesis.cancel()
         const makeUtter = (text, pitch, rate) => {
-            const utter = new SpeechSynthesisUtterance(text)
-            utter.lang = 'en-US'; utter.pitch = pitch; utter.rate = rate; utter.volume = 1
-            return utter
+            const u = new SpeechSynthesisUtterance(text)
+            u.lang = 'en-US'; u.pitch = pitch; u.rate = rate; u.volume = 1
+            return u
         }
         const msg1 = makeUtter('Khuda lagle BanglaEats e order koro! Ajker flash deal e trish percent chhad paccho!', 1.95, 1.25)
         const msg2 = makeUtter('Hey! Order now on BanglaEats and get thirty percent off! Limited time only, hurry up!', 1.85, 1.35)
@@ -898,69 +1612,55 @@ const FlashDealBanner = () => {
 
     return (
         <div style={{ background: '#111', position: 'relative', overflow: 'hidden' }}>
-            <style>{`
-                @keyframes be-marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
-                @keyframes be-bounce { from { transform: translateY(0) scale(1); } to { transform: translateY(-6px) scale(1.1); } }
-                @keyframes be-pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.25; } }
-                @keyframes be-glow { 0%,100% { box-shadow: 0 0 0 0 rgba(255,92,0,0); } 50% { box-shadow: 0 0 20px 6px rgba(255,92,0,0.4); } }
-                @keyframes be-shine { 0% { left: -100%; } 60%,100% { left: 160%; } }
-                @keyframes be-wave1 { 0%,100% { opacity: 0.3; transform: scale(1); } 50% { opacity: 1; transform: scale(1.3); } }
-                @keyframes be-wave2 { 0%,100% { opacity: 0.2; transform: scale(1); } 50% { opacity: 0.8; transform: scale(1.6); } }
-                @keyframes be-wave3 { 0%,100% { opacity: 0.1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(2); } }
-                @keyframes be-speaker-pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.12); } }
-                .be-shine { position: absolute; top: 0; left: -100%; width: 60%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.04), transparent); animation: be-shine 5s ease-in-out infinite; pointer-events: none; }
-                .be-fire { display: inline-block; animation: be-bounce 0.7s ease-in-out infinite alternate; }
-                .be-sep { font-size: 24px; font-weight: 800; color: #FF5C00; margin-bottom: 18px; animation: be-pulse 1s ease-in-out infinite; }
-                .be-badge { background: #FF5C00; color: #fff; font-size: 28px; font-weight: 900; padding: 8px 20px; border-radius: 12px; animation: be-glow 2s ease-in-out infinite; }
-                .be-cta { background: #fff; color: #111; font-size: 14px; font-weight: 700; padding: 12px 28px; border-radius: 99px; display: inline-block; transition: transform 0.15s; text-decoration: none; }
-                .be-cta:hover { background: #FFD166 !important; transform: scale(1.03); }
-                .be-speaker-inner { transition: all 0.3s ease; }
-                .be-speaker-btn:hover .be-speaker-inner { transform: scale(1.08); }
-            `}</style>
             <div className="be-shine" />
             <div style={{ background: '#FF5C00', padding: '8px 0', overflow: 'hidden', whiteSpace: 'nowrap' }}>
                 <div style={{ display: 'inline-block', animation: 'be-marquee 18s linear infinite', fontSize: 12, fontWeight: 600, color: '#fff', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
                     {Array(2).fill('⚡ Flash Deal চলছে \u00a0•\u00a0 আজকেই Order করো \u00a0•\u00a0 ৩০ মিনিটে ডেলিভারি \u00a0•\u00a0 সীমিত সময়ের অফার \u00a0•\u00a0 এখনই সুযোগ নাও \u00a0•\u00a0 ').join('')}
                 </div>
             </div>
-            <div className="max-w-6xl mx-auto px-6" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 24, padding: '28px 24px', flexWrap: 'wrap' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-                    <span className="be-fire" style={{ fontSize: 36 }}>🔥</span>
-                    <div>
-                        <div style={{ fontSize: 11, fontWeight: 700, color: '#FF5C00', letterSpacing: '0.15em', textTransform: 'uppercase', marginBottom: 4 }}>⚡ Limited Time Offer</div>
-                        <div style={{ fontSize: 22, fontWeight: 800, color: '#fff', lineHeight: 1.2 }}>আজকের Flash Deal!</div>
-                        <div style={{ fontSize: 13, color: '#888', marginTop: 4 }}>যেকোনো order এ বিশাল ছাড় — সময় শেষ হওয়ার আগেই নাও</div>
-                    </div>
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                    <TimeBlock val={h} label="ঘণ্টা" flip={flipping.h} />
-                    <span className="be-sep">:</span>
-                    <TimeBlock val={m} label="মিনিট" flip={flipping.m} />
-                    <span className="be-sep">:</span>
-                    <TimeBlock val={s} label="সেকেন্ড" flip={flipping.s} />
-                </div>
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 10 }}>
-                    <div className="be-badge">30% OFF</div>
-                    <Link to="/menu" className="be-cta">এখনই Order করো →</Link>
-                    <button onClick={playVoice} className="be-speaker-btn" style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>
-                        <div style={{ position: 'relative', width: 64, height: 64, animation: voicePlayed ? 'be-speaker-pulse 0.8s ease-in-out infinite' : 'none' }}>
-                            {voicePlayed && <>
-                                <div style={{ position: 'absolute', inset: 0, borderRadius: '50%', border: '2px solid #FF5C00', animation: 'be-wave1 1.2s ease-in-out infinite' }} />
-                                <div style={{ position: 'absolute', inset: -10, borderRadius: '50%', border: '2px solid #FF5C00', animation: 'be-wave2 1.2s ease-in-out infinite 0.2s' }} />
-                                <div style={{ position: 'absolute', inset: -20, borderRadius: '50%', border: '2px solid #FF5C00', animation: 'be-wave3 1.2s ease-in-out infinite 0.4s' }} />
-                            </>}
-                            <div className="be-speaker-inner" style={{ position: 'relative', zIndex: 2, width: 64, height: 64, borderRadius: '50%', background: voicePlayed ? 'linear-gradient(145deg, #FF5C00, #ff8c00)' : 'linear-gradient(145deg, #2a2a2a, #1a1a1a)', boxShadow: voicePlayed ? '0 8px 32px rgba(255,92,0,0.5), inset 0 2px 4px rgba(255,255,255,0.15)' : '0 8px 24px rgba(0,0,0,0.5), inset 0 2px 4px rgba(255,255,255,0.08)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                                <span style={{ fontSize: 26, lineHeight: 1, filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))' }}>{voicePlayed ? '🔊' : '🔇'}</span>
-                                <span style={{ fontSize: 8, fontWeight: 700, marginTop: 3, color: voicePlayed ? 'rgba(255,255,255,0.9)' : 'rgba(255,255,255,0.4)', textTransform: 'uppercase' }}>{voicePlayed ? 'Playing' : 'Tap'}</span>
-                            </div>
+            <div className="be-container">
+                <div className="be-flash-inner">
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+                        <span className="be-fire" style={{ fontSize: 36 }}>🔥</span>
+                        <div>
+                            <div style={{ fontSize: 11, fontWeight: 700, color: '#FF5C00', letterSpacing: '0.15em', textTransform: 'uppercase', marginBottom: 4 }}>⚡ Limited Time Offer</div>
+                            <div style={{ fontSize: 22, fontWeight: 800, color: '#fff', lineHeight: 1.2 }}>আজকের Flash Deal!</div>
+                            <div style={{ fontSize: 13, color: '#888', marginTop: 4 }}>যেকোনো order এ বিশাল ছাড় — সময় শেষ হওয়ার আগেই নাও</div>
                         </div>
-                    </button>
+                    </div>
+
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                        <TimeBlock val={h} label="ঘণ্টা" flip={flipping.h} />
+                        <span className="be-sep">:</span>
+                        <TimeBlock val={m} label="মিনিট" flip={flipping.m} />
+                        <span className="be-sep">:</span>
+                        <TimeBlock val={s} label="সেকেন্ড" flip={flipping.s} />
+                    </div>
+
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 10 }}>
+                        <div className="be-badge">30% OFF</div>
+                        <Link to="/menu" className="be-cta">এখনই Order করো →</Link>
+                        <button onClick={playVoice} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>
+                            <div style={{ position: 'relative', width: 64, height: 64, animation: voicePlayed ? 'be-speaker-pulse 0.8s ease-in-out infinite' : 'none' }}>
+                                {voicePlayed && <>
+                                    <div style={{ position: 'absolute', inset: 0, borderRadius: '50%', border: '2px solid #FF5C00', animation: 'be-wave1 1.2s ease-in-out infinite' }} />
+                                    <div style={{ position: 'absolute', inset: -10, borderRadius: '50%', border: '2px solid #FF5C00', animation: 'be-wave2 1.2s ease-in-out infinite 0.2s' }} />
+                                    <div style={{ position: 'absolute', inset: -20, borderRadius: '50%', border: '2px solid #FF5C00', animation: 'be-wave3 1.2s ease-in-out infinite 0.4s' }} />
+                                </>}
+                                <div style={{ position: 'relative', zIndex: 2, width: 64, height: 64, borderRadius: '50%', background: voicePlayed ? 'linear-gradient(145deg, #FF5C00, #ff8c00)' : 'linear-gradient(145deg, #2a2a2a, #1a1a1a)', boxShadow: voicePlayed ? '0 8px 32px rgba(255,92,0,0.5)' : '0 8px 24px rgba(0,0,0,0.5)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                                    <span style={{ fontSize: 26, lineHeight: 1 }}>{voicePlayed ? '🔊' : '🔇'}</span>
+                                    <span style={{ fontSize: 8, fontWeight: 700, marginTop: 3, color: voicePlayed ? 'rgba(255,255,255,0.9)' : 'rgba(255,255,255,0.4)', textTransform: 'uppercase' }}>{voicePlayed ? 'Playing' : 'Tap'}</span>
+                                </div>
+                            </div>
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
     )
 }
 
+/* ── How It Works ── */
 const HowItWorks = () => {
     const steps = [
         { step: '01', icon: '🍔', title: 'খাবার বেছে নাও', desc: 'Menu থেকে তোমার পছন্দের খাবার select করো এবং cart এ add করো।' },
@@ -968,158 +1668,116 @@ const HowItWorks = () => {
         { step: '03', icon: '🛵', title: 'ডেলিভারি পাও', desc: 'মাত্র ৩০ মিনিটের মধ্যে গরম খাবার তোমার দরজায় পৌঁছে যাবে।' },
     ]
     return (
-        <div className="py-16 px-4" style={{ background: '#fff' }}>
-            <div className="max-w-6xl mx-auto">
-                <div className="text-center mb-12">
-                    <span className="inline-block text-sm font-medium px-4 py-1 rounded-full mb-3" style={{ background: '#FFF0E5', color: '#FF5C00' }}>মাত্র ৩টি ধাপ</span>
-                    <h2 className="text-3xl font-bold text-gray-800">কীভাবে কাজ করে?</h2>
+        <div style={{ background: '#fff', padding: '64px 0' }}>
+            <div className="be-container">
+                <div style={{ textAlign: 'center', marginBottom: 48 }}>
+                    <span style={{ display: 'inline-block', fontSize: 13, fontWeight: 500, padding: '4px 16px', borderRadius: 99, marginBottom: 12, background: '#FFF0E5', color: '#FF5C00' }}>মাত্র ৩টি ধাপ</span>
+                    <h2 style={{ fontSize: 28, fontWeight: 800, color: '#1c1917' }}>কীভাবে কাজ করে?</h2>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8 relative">
-                    <div className="hidden md:block absolute top-12 left-1/4 right-1/4 h-0.5" style={{ background: 'linear-gradient(to right, #FF5C00, #FFD166)' }} />
+                <div className="be-hiw-grid">
+                    <div className="be-hiw-line" />
                     {steps.map((s, i) => (
-                        <div key={i} className="flex flex-col items-center text-center relative">
-                            <div className="w-24 h-24 rounded-full flex items-center justify-center mb-6 relative z-10" style={{ background: '#FFF0E5', border: '3px solid #FF5C00' }}>
+                        <div key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', position: 'relative' }}>
+                            <div style={{ width: 96, height: 96, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 24, position: 'relative', zIndex: 10, background: '#FFF0E5', border: '3px solid #FF5C00' }}>
                                 <span style={{ fontSize: 38 }}>{s.icon}</span>
-                                <div className="absolute -top-1 -right-1 w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold text-white" style={{ background: '#FF5C00' }}>{s.step}</div>
+                                <div style={{ position: 'absolute', top: -4, right: -4, width: 28, height: 28, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 700, color: 'white', background: '#FF5C00' }}>{s.step}</div>
                             </div>
-                            <h3 className="text-lg font-bold text-gray-800 mb-2">{s.title}</h3>
-                            <p className="text-gray-400 text-sm leading-relaxed max-w-xs">{s.desc}</p>
-                            {i < steps.length - 1 && <div className="md:hidden text-2xl my-4" style={{ color: '#FF5C00' }}>↓</div>}
+                            <h3 style={{ fontSize: 17, fontWeight: 700, color: '#1c1917', marginBottom: 8 }}>{s.title}</h3>
+                            <p style={{ color: '#a8a29e', fontSize: 14, lineHeight: 1.6, maxWidth: 260 }}>{s.desc}</p>
+                            {i < steps.length - 1 && <div style={{ fontSize: 22, color: '#FF5C00', marginTop: 16, display: 'none' }} className="be-hiw-arrow">↓</div>}
                         </div>
                     ))}
                 </div>
-                <div className="text-center mt-12">
-                    <Link to="/menu" className="inline-block px-10 py-4 rounded-full font-bold text-lg text-white transition hover:opacity-90" style={{ background: '#FF5C00' }}>এখনই শুরু করো →</Link>
+                <div style={{ textAlign: 'center', marginTop: 48 }}>
+                    <Link to="/menu" style={{ display: 'inline-block', padding: '14px 40px', borderRadius: 99, fontWeight: 700, fontSize: 16, color: 'white', background: '#FF5C00', textDecoration: 'none' }}>
+                        এখনই শুরু করো →
+                    </Link>
                 </div>
             </div>
         </div>
     )
 }
 
-/* ── Mascot Character ── */
+/* ── Mascot ── */
 const Mascot = () => {
     const [visible, setVisible] = useState(false)
     const [talking, setTalking] = useState(false)
     const [mouthOpen, setMouthOpen] = useState(false)
 
     const speak = () => {
-        setTalking(true)
-        setMouthOpen(true)
+        setTalking(true); setMouthOpen(true)
         window.speechSynthesis.cancel()
         const makeUtter = (text, pitch, rate) => {
-            const utter = new SpeechSynthesisUtterance(text)
-            utter.lang = 'en-US'; utter.pitch = pitch; utter.rate = rate; utter.volume = 1
-            return utter
+            const u = new SpeechSynthesisUtterance(text)
+            u.lang = 'en-US'; u.pitch = pitch; u.rate = rate; u.volume = 1
+            return u
         }
         const msg1 = makeUtter('Khuda lagle BanglaEats e order koro! Ajker flash deal e trish percent chhad paccho!', 1.95, 1.25)
         const msg2 = makeUtter('Hey! Order now on BanglaEats and get thirty percent off! Limited time only, hurry up!', 1.85, 1.35)
         msg2.onend = () => { setTalking(false); setMouthOpen(false) }
         msg1.onend = () => window.speechSynthesis.speak(msg2)
         window.speechSynthesis.speak(msg1)
-
-        // mouth animation
         const mouthInterval = setInterval(() => setMouthOpen(prev => !prev), 300)
         setTimeout(() => clearInterval(mouthInterval), 6000)
     }
 
     useEffect(() => {
-        // page load হলে ০.৮ সেকেন্ড পরে appear করবে
         const showTimer = setTimeout(() => {
             setVisible(true)
-            // appear হওয়ার পরে voice play করবে
             const voiceTimer = setTimeout(() => speak(), 600)
             return () => clearTimeout(voiceTimer)
         }, 800)
-
-        return () => {
-            clearTimeout(showTimer)
-            window.speechSynthesis.cancel()
-        }
+        return () => { clearTimeout(showTimer); window.speechSynthesis.cancel() }
     }, [])
 
     if (!visible) return null
 
     return (
-        <>
-            <style>{`
-                @keyframes mascot-float { 0%,100% { transform: translateY(0px); } 50% { transform: translateY(-8px); } }
-                @keyframes mascot-appear { from { transform: translateY(100px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-                @keyframes mascot-wave { 0%,100% { transform: rotate(0deg); } 25% { transform: rotate(-20deg); } 75% { transform: rotate(20deg); } }
-                @keyframes bubble-appear { from { transform: scale(0); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-                @keyframes mascot-talk { 0%,100% { transform: scaleY(1); } 50% { transform: scaleY(0.3); } }
-            `}</style>
-
-            <div style={{ position: 'fixed', bottom: 20, right: 20, zIndex: 9999, display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 8, animation: 'mascot-appear 0.5s ease-out' }}>
-
-                {/* Speech Bubble */}
-                <div style={{ background: '#fff', borderRadius: 16, padding: '12px 16px', boxShadow: '0 8px 32px rgba(0,0,0,0.15)', maxWidth: 220, fontSize: 13, color: '#333', lineHeight: 1.6, border: '1.5px solid #FFE0CC', position: 'relative', animation: 'bubble-appear 0.4s ease-out 0.3s both' }}>
-                    🍔 ক্ষুধা লাগছে? আজকের Flash Deal এ <strong style={{ color: '#FF5C00' }}>৩০% OFF</strong> পাচ্ছো! এখনই order করো!
-                    <div style={{ position: 'absolute', bottom: -10, right: 30, width: 0, height: 0, borderLeft: '10px solid transparent', borderRight: '10px solid transparent', borderTop: '10px solid #fff' }} />
-                    <button onClick={() => { setVisible(false); window.speechSynthesis.cancel() }} style={{ position: 'absolute', top: -8, right: -8, width: 20, height: 20, borderRadius: '50%', background: '#FF5C00', color: '#fff', border: 'none', cursor: 'pointer', fontSize: 10, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
-                </div>
-
-                {/* Mascot Body */}
-                <div onClick={speak} style={{ cursor: 'pointer', animation: 'mascot-float 3s ease-in-out infinite', userSelect: 'none' }}>
-                    <svg width="90" height="120" viewBox="0 0 90 120" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        {/* Body */}
-                        <ellipse cx="45" cy="85" rx="28" ry="32" fill="#FF5C00" />
-                        {/* Belly */}
-                        <ellipse cx="45" cy="88" rx="18" ry="20" fill="#FF8C42" />
-                        {/* Head */}
-                        <circle cx="45" cy="38" r="28" fill="#FFDAB9" />
-                        {/* Hair */}
-                        <ellipse cx="45" cy="12" rx="22" ry="8" fill="#4A2800" />
-                        <rect x="23" y="10" width="44" height="10" rx="5" fill="#4A2800" />
-                        {/* Eyes */}
-                        <circle cx="35" cy="35" r="5" fill="white" />
-                        <circle cx="55" cy="35" r="5" fill="white" />
-                        <circle cx="36" cy="35" r="3" fill="#333" />
-                        <circle cx="56" cy="35" r="3" fill="#333" />
-                        <circle cx="37" cy="34" r="1" fill="white" />
-                        <circle cx="57" cy="34" r="1" fill="white" />
-                        {/* Eyebrows */}
-                        <path d="M30 28 Q35 25 40 28" stroke="#4A2800" strokeWidth="2" strokeLinecap="round" fill="none" />
-                        <path d="M50 28 Q55 25 60 28" stroke="#4A2800" strokeWidth="2" strokeLinecap="round" fill="none" />
-                        {/* Nose */}
-                        <ellipse cx="45" cy="42" rx="3" ry="2" fill="#E8A87C" />
-                        {/* Mouth */}
-                        {mouthOpen ? (
-                            <ellipse cx="45" cy="50" rx="8" ry="5" fill="#CC3300" />
-                        ) : (
-                            <path d="M37 50 Q45 57 53 50" stroke="#CC3300" strokeWidth="2.5" strokeLinecap="round" fill="none" />
-                        )}
-                        {/* Cheeks */}
-                        <ellipse cx="30" cy="44" rx="6" ry="4" fill="#FFB6A3" opacity="0.6" />
-                        <ellipse cx="60" cy="44" rx="6" ry="4" fill="#FFB6A3" opacity="0.6" />
-                        {/* Left Arm - waving */}
-                        <ellipse cx="15" cy="80" rx="8" ry="22" fill="#FF5C00" transform="rotate(-20 15 80)" style={{ animation: talking ? 'mascot-wave 0.4s ease-in-out infinite' : 'none', transformOrigin: '15px 65px' }} />
-                        {/* Right Arm */}
-                        <ellipse cx="75" cy="80" rx="8" ry="22" fill="#FF5C00" transform="rotate(20 75 80)" />
-                        {/* Legs */}
-                        <ellipse cx="35" cy="115" rx="9" ry="12" fill="#CC3300" />
-                        <ellipse cx="55" cy="115" rx="9" ry="12" fill="#CC3300" />
-                        {/* Feet */}
-                        <ellipse cx="33" cy="124" rx="11" ry="6" fill="#4A2800" />
-                        <ellipse cx="57" cy="124" rx="11" ry="6" fill="#4A2800" />
-                        {/* Chef Hat */}
-                        <rect x="28" y="6" width="34" height="14" rx="4" fill="white" />
-                        <ellipse cx="45" cy="6" rx="16" ry="8" fill="white" />
-                        <rect x="30" y="14" width="30" height="4" rx="2" fill="#FF5C00" />
-                        {/* Sound waves when talking */}
-                        {talking && <>
-                            <circle cx="75" cy="35" r="8" fill="none" stroke="#FF5C00" strokeWidth="2" opacity="0.6" style={{ animation: 'be-wave1 1s ease-in-out infinite' }} />
-                            <circle cx="75" cy="35" r="14" fill="none" stroke="#FF5C00" strokeWidth="1.5" opacity="0.3" style={{ animation: 'be-wave2 1s ease-in-out infinite 0.2s' }} />
-                        </>}
-                    </svg>
-                    <div style={{ textAlign: 'center', fontSize: 10, color: '#FF5C00', fontWeight: 700, marginTop: -4 }}>
-                        {talking ? '🔊 বলছি...' : '👆 Click করো'}
-                    </div>
+        <div className="be-mascot" style={{ position: 'fixed', bottom: 20, right: 20, zIndex: 9999, display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 8, animation: 'mascot-appear 0.5s ease-out' }}>
+            <div style={{ background: '#fff', borderRadius: 16, padding: '12px 16px', boxShadow: '0 8px 32px rgba(0,0,0,0.15)', maxWidth: 220, fontSize: 13, color: '#333', lineHeight: 1.6, border: '1.5px solid #FFE0CC', position: 'relative', animation: 'bubble-appear 0.4s ease-out 0.3s both' }}>
+                🍔 ক্ষুধা লাগছে? আজকের Flash Deal এ <strong style={{ color: '#FF5C00' }}>৩০% OFF</strong> পাচ্ছো!
+                <div style={{ position: 'absolute', bottom: -10, right: 30, width: 0, height: 0, borderLeft: '10px solid transparent', borderRight: '10px solid transparent', borderTop: '10px solid #fff' }} />
+                <button onClick={() => { setVisible(false); window.speechSynthesis.cancel() }} style={{ position: 'absolute', top: -8, right: -8, width: 20, height: 20, borderRadius: '50%', background: '#FF5C00', color: '#fff', border: 'none', cursor: 'pointer', fontSize: 10, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
+            </div>
+            <div onClick={speak} style={{ cursor: 'pointer', animation: 'mascot-float 3s ease-in-out infinite', userSelect: 'none' }}>
+                <svg width="90" height="120" viewBox="0 0 90 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <ellipse cx="45" cy="85" rx="28" ry="32" fill="#FF5C00" />
+                    <ellipse cx="45" cy="88" rx="18" ry="20" fill="#FF8C42" />
+                    <circle cx="45" cy="38" r="28" fill="#FFDAB9" />
+                    <ellipse cx="45" cy="12" rx="22" ry="8" fill="#4A2800" />
+                    <rect x="23" y="10" width="44" height="10" rx="5" fill="#4A2800" />
+                    <circle cx="35" cy="35" r="5" fill="white" /><circle cx="55" cy="35" r="5" fill="white" />
+                    <circle cx="36" cy="35" r="3" fill="#333" /><circle cx="56" cy="35" r="3" fill="#333" />
+                    <circle cx="37" cy="34" r="1" fill="white" /><circle cx="57" cy="34" r="1" fill="white" />
+                    <path d="M30 28 Q35 25 40 28" stroke="#4A2800" strokeWidth="2" strokeLinecap="round" fill="none" />
+                    <path d="M50 28 Q55 25 60 28" stroke="#4A2800" strokeWidth="2" strokeLinecap="round" fill="none" />
+                    <ellipse cx="45" cy="42" rx="3" ry="2" fill="#E8A87C" />
+                    {mouthOpen ? <ellipse cx="45" cy="50" rx="8" ry="5" fill="#CC3300" /> : <path d="M37 50 Q45 57 53 50" stroke="#CC3300" strokeWidth="2.5" strokeLinecap="round" fill="none" />}
+                    <ellipse cx="30" cy="44" rx="6" ry="4" fill="#FFB6A3" opacity="0.6" />
+                    <ellipse cx="60" cy="44" rx="6" ry="4" fill="#FFB6A3" opacity="0.6" />
+                    <ellipse cx="15" cy="80" rx="8" ry="22" fill="#FF5C00" transform="rotate(-20 15 80)" style={{ animation: talking ? 'mascot-wave 0.4s ease-in-out infinite' : 'none', transformOrigin: '15px 65px' }} />
+                    <ellipse cx="75" cy="80" rx="8" ry="22" fill="#FF5C00" transform="rotate(20 75 80)" />
+                    <ellipse cx="35" cy="115" rx="9" ry="12" fill="#CC3300" />
+                    <ellipse cx="55" cy="115" rx="9" ry="12" fill="#CC3300" />
+                    <ellipse cx="33" cy="124" rx="11" ry="6" fill="#4A2800" />
+                    <ellipse cx="57" cy="124" rx="11" ry="6" fill="#4A2800" />
+                    <rect x="28" y="6" width="34" height="14" rx="4" fill="white" />
+                    <ellipse cx="45" cy="6" rx="16" ry="8" fill="white" />
+                    <rect x="30" y="14" width="30" height="4" rx="2" fill="#FF5C00" />
+                    {talking && <>
+                        <circle cx="75" cy="35" r="8" fill="none" stroke="#FF5C00" strokeWidth="2" opacity="0.6" style={{ animation: 'be-wave1 1s ease-in-out infinite' }} />
+                        <circle cx="75" cy="35" r="14" fill="none" stroke="#FF5C00" strokeWidth="1.5" opacity="0.3" style={{ animation: 'be-wave2 1s ease-in-out infinite 0.2s' }} />
+                    </>}
+                </svg>
+                <div style={{ textAlign: 'center', fontSize: 10, color: '#FF5C00', fontWeight: 700, marginTop: -4 }}>
+                    {talking ? '🔊 বলছি...' : '👆 Click করো'}
                 </div>
             </div>
-        </>
+        </div>
     )
 }
 
+/* ── Main Home ── */
 const Home = () => {
     const [foods, setFoods] = useState([])
     const { addToCart } = useCart()
@@ -1131,153 +1789,167 @@ const Home = () => {
     }, [])
 
     return (
-        <div>
-            {/* Mascot — সব সময় fixed corner এ থাকবে */}
+        <div style={{ fontFamily: "'Sora', sans-serif" }}>
+            <GlobalStyles />
             <Mascot />
 
-            {/* Hero */}
-            <div className="relative text-white overflow-hidden" style={{ minHeight: 580 }}>
+            {/* ── Hero ── */}
+            <div style={{ position: 'relative', color: 'white', overflow: 'hidden', minHeight: 580 }}>
                 <img src={HERO_BG} alt="" aria-hidden="true" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center', zIndex: 0 }} />
                 <div style={{ position: 'absolute', inset: 0, zIndex: 1, background: 'linear-gradient(110deg, rgba(0,0,0,0.80) 0%, rgba(0,0,0,0.55) 55%, rgba(0,0,0,0.20) 100%)' }} />
                 <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 130, zIndex: 2, background: 'linear-gradient(to top, rgba(255,92,0,0.6) 0%, transparent 100%)' }} />
-                <div className="relative max-w-6xl mx-auto px-6 flex flex-col justify-center" style={{ zIndex: 3, minHeight: 580, paddingTop: 90, paddingBottom: 110 }}>
-                    <span className="inline-block text-sm font-medium px-4 py-1 rounded-full mb-6 self-start" style={{ background: 'rgba(255,92,0,0.9)', border: '1px solid rgba(255,255,255,0.2)' }}>⚡ ৩০ মিনিটে ডেলিভারি</span>
-                    <h1 style={{ fontSize: 'clamp(2.2rem, 4.5vw, 3.5rem)', fontWeight: 800, lineHeight: 1.2, marginBottom: 10 }}>ক্ষুধা লাগলে</h1>
-                    <div style={{ marginBottom: 14 }}>
-                        <span style={{ fontSize: 'clamp(2.8rem, 6vw, 5rem)', fontWeight: 900, letterSpacing: '-0.02em', background: 'linear-gradient(90deg, #FF5C00 0%, #FFD166 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text', display: 'inline' }}>BanglaEats</span>
-                        <span style={{ fontSize: 'clamp(2.2rem, 4.5vw, 3.5rem)', fontWeight: 800, marginLeft: 10, color: '#fff' }}>আছে!</span>
-                    </div>
-                    <p style={{ fontSize: 12, letterSpacing: '0.18em', textTransform: 'uppercase', color: '#FFD166', marginBottom: 20, fontWeight: 600, opacity: 0.9 }}>Dhaka's #1 Food Delivery Platform</p>
-                    <p style={{ fontSize: '1.1rem', color: 'rgba(255,255,255,0.75)', maxWidth: 460, marginBottom: 36, lineHeight: 1.6 }}>Dhaka-তে সেরা রেস্টুরেন্ট থেকে তাজা খাবার, দ্রুত ডেলিভারি</p>
-                    <div className="flex gap-4 flex-wrap">
-                        <Link to="/menu" className="px-8 py-3 rounded-full font-bold text-lg transition" style={{ background: '#FF5C00', color: '#fff', boxShadow: '0 4px 24px rgba(255,92,0,0.5)' }}>এখনই Order করো 🍔</Link>
-                        <Link to="/orders" className="px-8 py-3 rounded-full font-bold text-lg transition" style={{ border: '2px solid rgba(255,255,255,0.45)', color: '#fff', background: 'rgba(255,255,255,0.08)' }}>My Orders</Link>
+
+                <div className="be-container">
+                    <div className="be-hero-content">
+                        <span style={{ display: 'inline-block', fontSize: 13, fontWeight: 600, padding: '4px 16px', borderRadius: 99, marginBottom: 24, alignSelf: 'flex-start', background: 'rgba(255,92,0,0.9)', border: '1px solid rgba(255,255,255,0.2)' }}>⚡ ৩০ মিনিটে ডেলিভারি</span>
+                        <h1 style={{ fontSize: 'clamp(2rem, 4.5vw, 3.5rem)', fontWeight: 800, lineHeight: 1.2, marginBottom: 10 }}>ক্ষুধা লাগলে</h1>
+                        <div style={{ marginBottom: 14 }}>
+                            <span style={{ fontSize: 'clamp(2.6rem, 6vw, 5rem)', fontWeight: 900, letterSpacing: '-0.02em', background: 'linear-gradient(90deg, #FF5C00 0%, #FFD166 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text', display: 'inline' }}>BanglaEats</span>
+                            <span style={{ fontSize: 'clamp(2rem, 4.5vw, 3.5rem)', fontWeight: 800, marginLeft: 10, color: '#fff' }}>আছে!</span>
+                        </div>
+                        <p style={{ fontSize: 12, letterSpacing: '0.18em', textTransform: 'uppercase', color: '#FFD166', marginBottom: 16, fontWeight: 600 }}>Dhaka's #1 Food Delivery Platform</p>
+                        <p style={{ fontSize: '1rem', color: 'rgba(255,255,255,0.75)', maxWidth: 460, marginBottom: 32, lineHeight: 1.7 }}>Dhaka-তে সেরা রেস্টুরেন্ট থেকে তাজা খাবার, দ্রুত ডেলিভারি</p>
+                        <div className="be-hero-btns">
+                            <Link to="/menu" style={{ padding: '12px 32px', borderRadius: 99, fontWeight: 700, fontSize: 16, color: '#fff', background: '#FF5C00', boxShadow: '0 4px 24px rgba(255,92,0,0.5)', textDecoration: 'none' }}>এখনই Order করো 🍔</Link>
+                            <Link to="/orders" style={{ padding: '12px 32px', borderRadius: 99, fontWeight: 700, fontSize: 16, color: '#fff', border: '2px solid rgba(255,255,255,0.45)', background: 'rgba(255,255,255,0.08)', textDecoration: 'none' }}>My Orders</Link>
+                        </div>
                     </div>
                 </div>
+
                 <svg viewBox="0 0 1440 60" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ position: 'absolute', bottom: -1, left: 0, right: 0, zIndex: 4, display: 'block' }}>
                     <path d="M0 60L1440 60L1440 30C1440 30 1080 0 720 0C360 0 0 30 0 30L0 60Z" fill="#FFF8F3" />
                 </svg>
             </div>
 
-            {/* Stats */}
+            {/* ── Stats ── */}
             <div style={{ background: '#FFF8F3', borderBottom: '0.5px solid #FFE0CC' }}>
-                <div className="max-w-6xl mx-auto px-4 py-6 grid grid-cols-3 divide-x divide-orange-100 text-center">
-                    {[{ num: '৫০০+', label: 'খুশি Customer' }, { num: '৩০', label: 'মিনিটে Delivery' }, { num: '১০০+', label: 'Food Item' }].map(s => (
-                        <div key={s.label}>
-                            <div className="text-3xl font-bold" style={{ color: '#FF5C00' }}>{s.num}</div>
-                            <div className="text-sm mt-1 text-gray-400">{s.label}</div>
-                        </div>
-                    ))}
+                <div className="be-container">
+                    <div className="be-stats-row" style={{ textAlign: 'center' }}>
+                        {[{ num: '৫০০+', label: 'খুশি Customer' }, { num: '৩০', label: 'মিনিটে Delivery' }, { num: '১০০+', label: 'Food Item' }].map((s, i) => (
+                            <div key={s.label} style={{ padding: '24px 0', borderRight: i < 2 ? '0.5px solid #FFE0CC' : 'none' }}>
+                                <div style={{ fontSize: 28, fontWeight: 800, color: '#FF5C00' }}>{s.num}</div>
+                                <div style={{ fontSize: 13, marginTop: 4, color: '#a8a29e' }}>{s.label}</div>
+                            </div>
+                        ))}
+                    </div>
                 </div>
             </div>
 
-            {/* Categories */}
-            <div className="max-w-6xl mx-auto px-4 py-12">
-                <div className="flex items-center justify-between mb-7">
-                    <h2 className="text-2xl font-bold text-gray-800">Category বেছে নাও</h2>
-                    <Link to="/menu" className="text-sm font-medium hover:underline" style={{ color: '#FF5C00' }}>সব দেখো →</Link>
-                </div>
-                <div className="grid grid-cols-3 md:grid-cols-6 gap-4">
-                    {[
-                        { name: 'Burger', icon: '🍔', count: '24 items' },
-                        { name: 'Pizza', icon: '🍕', count: '18 items' },
-                        { name: 'Biryani', icon: '🍛', count: '12 items' },
-                        { name: 'Chicken', icon: '🍗', count: '20 items' },
-                        { name: 'Dessert', icon: '🍰', count: '15 items' },
-                        { name: 'Drinks', icon: '🥤', count: '10 items' },
-                    ].map(cat => (
-                        <Link to="/menu" key={cat.name} className="group relative flex flex-col items-center rounded-2xl p-5 pb-4 transition hover:-translate-y-1 cursor-pointer overflow-hidden" style={{ border: '0.5px solid #f0e0d6', background: '#fff' }}>
-                            <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity rounded-2xl" style={{ background: '#FFF5F0' }} />
-                            <div className="relative z-10 flex items-center justify-center mb-3" style={{ width: 56, height: 56, borderRadius: 16, background: '#FFF0E5', fontSize: 26 }}>{cat.icon}</div>
-                            <span className="relative z-10 text-sm font-semibold transition-colors group-hover:text-orange-500" style={{ color: '#555' }}>{cat.name}</span>
-                            <span className="relative z-10 text-xs mt-1" style={{ color: '#bbb' }}>{cat.count}</span>
-                        </Link>
-                    ))}
+            {/* ── Categories ── */}
+            <div style={{ padding: '48px 0' }}>
+                <div className="be-container">
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 28 }}>
+                        <h2 style={{ fontSize: 22, fontWeight: 700, color: '#1c1917' }}>Category বেছে নাও</h2>
+                        <Link to="/menu" style={{ fontSize: 13, fontWeight: 600, color: '#FF5C00', textDecoration: 'none' }}>সব দেখো →</Link>
+                    </div>
+                    <div className="be-grid-6">
+                        {[
+                            { name: 'Burger', icon: '🍔', count: '24 items' },
+                            { name: 'Pizza', icon: '🍕', count: '18 items' },
+                            { name: 'Biryani', icon: '🍛', count: '12 items' },
+                            { name: 'Chicken', icon: '🍗', count: '20 items' },
+                            { name: 'Dessert', icon: '🍰', count: '15 items' },
+                            { name: 'Drinks', icon: '🥤', count: '10 items' },
+                        ].map(cat => (
+                            <Link to="/menu" key={cat.name} className="be-cat-card" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', borderRadius: 18, padding: '20px 12px 16px', border: '0.5px solid #f0e0d6', background: '#fff', textDecoration: 'none', cursor: 'pointer' }}>
+                                <div style={{ width: 56, height: 56, borderRadius: 16, background: '#FFF0E5', fontSize: 26, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 12 }}>{cat.icon}</div>
+                                <span style={{ fontSize: 13, fontWeight: 600, color: '#555' }}>{cat.name}</span>
+                                <span style={{ fontSize: 11, marginTop: 4, color: '#bbb' }}>{cat.count}</span>
+                            </Link>
+                        ))}
+                    </div>
                 </div>
             </div>
 
             <FlashDealBanner />
             <HowItWorks />
 
+            {/* ── Featured Foods ── */}
             {foods.length > 0 && (
-                <div className="max-w-6xl mx-auto px-4 pb-12">
-                    <div className="flex justify-between items-center mb-6">
-                        <h2 className="text-2xl font-bold text-gray-800">🔥 Featured Foods</h2>
-                        <Link to="/menu" className="text-sm font-medium hover:underline" style={{ color: '#FF5C00' }}>সব দেখো →</Link>
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {foods.map(food => (
-                            <div key={food._id} className="bg-white rounded-2xl overflow-hidden group transition hover:shadow-md" style={{ border: '0.5px solid #f0e0d6' }}>
-                                <div className="relative overflow-hidden">
-                                    <img src={food.image} alt={food.name} className="w-full h-48 object-cover group-hover:scale-105 transition duration-300" />
-                                    <span className="absolute top-3 left-3 text-white text-xs font-bold px-3 py-1 rounded-full" style={{ background: '#FF5C00' }}>{food.category}</span>
-                                </div>
-                                <div className="p-4">
-                                    <h3 className="text-lg font-bold text-gray-800 mb-1">{food.name}</h3>
-                                    <p className="text-gray-400 text-sm mb-4 line-clamp-2">{food.description}</p>
-                                    <div className="flex justify-between items-center">
-                                        <span className="font-bold text-xl" style={{ color: '#FF5C00' }}>৳{food.price}</span>
-                                        <button onClick={() => addToCart(food)} className="text-white text-sm font-medium px-4 py-2 rounded-full transition hover:opacity-90" style={{ background: '#FF5C00' }}>+ Add to Cart</button>
+                <div style={{ padding: '0 0 48px' }}>
+                    <div className="be-container">
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
+                            <h2 style={{ fontSize: 22, fontWeight: 700, color: '#1c1917' }}>🔥 Featured Foods</h2>
+                            <Link to="/menu" style={{ fontSize: 13, fontWeight: 600, color: '#FF5C00', textDecoration: 'none' }}>সব দেখো →</Link>
+                        </div>
+                        <div className="be-grid-3">
+                            {foods.map(food => (
+                                <div key={food._id} className="be-food-card" style={{ background: 'white', borderRadius: 20, overflow: 'hidden', border: '0.5px solid #f0e0d6' }}>
+                                    <div style={{ position: 'relative', overflow: 'hidden' }}>
+                                        <img src={food.image} alt={food.name} className="be-food-img" style={{ width: '100%', height: 192, objectFit: 'cover', display: 'block' }} />
+                                        <span style={{ position: 'absolute', top: 12, left: 12, color: 'white', fontSize: 11, fontWeight: 700, padding: '4px 10px', borderRadius: 99, background: '#FF5C00' }}>{food.category}</span>
+                                    </div>
+                                    <div style={{ padding: 16 }}>
+                                        <h3 style={{ fontSize: 16, fontWeight: 700, color: '#1c1917', marginBottom: 4 }}>{food.name}</h3>
+                                        <p style={{ color: '#a8a29e', fontSize: 13, marginBottom: 16, lineHeight: 1.5, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{food.description}</p>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                            <span style={{ fontWeight: 800, fontSize: 20, color: '#FF5C00' }}>৳{food.price}</span>
+                                            <button onClick={() => addToCart(food)} style={{ color: 'white', fontSize: 13, fontWeight: 600, padding: '8px 16px', borderRadius: 99, background: '#FF5C00', border: 'none', cursor: 'pointer' }}>+ Add to Cart</button>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        ))}
+                            ))}
+                        </div>
                     </div>
                 </div>
             )}
 
             <OffersSection />
 
-            <div style={{ background: '#FFF8F3' }} className="py-16 px-4">
-                <div className="max-w-6xl mx-auto">
-                    <div className="text-center mb-12">
-                        <span className="inline-block text-xs font-semibold px-4 py-1 rounded-full mb-3 uppercase tracking-widest" style={{ background: '#FFF0E5', color: '#FF5C00' }}>আমাদের সুবিধা</span>
-                        <h2 className="text-3xl font-bold text-gray-900 mb-2">কেন BanglaEats বেছে নেবে?</h2>
-                        <p className="text-gray-400 text-sm">Dhaka-তে সবচেয়ে ভালো food delivery experience আমরাই দিই</p>
+            {/* ── Why Us ── */}
+            <div style={{ background: '#FFF8F3', padding: '64px 0' }}>
+                <div className="be-container">
+                    <div style={{ textAlign: 'center', marginBottom: 48 }}>
+                        <span style={{ display: 'inline-block', fontSize: 11, fontWeight: 700, padding: '4px 16px', borderRadius: 99, marginBottom: 12, letterSpacing: '0.1em', textTransform: 'uppercase', background: '#FFF0E5', color: '#FF5C00' }}>আমাদের সুবিধা</span>
+                        <h2 style={{ fontSize: 28, fontWeight: 800, color: '#1c1917', marginBottom: 8 }}>কেন BanglaEats বেছে নেবে?</h2>
+                        <p style={{ color: '#a8a29e', fontSize: 14 }}>Dhaka-তে সবচেয়ে ভালো food delivery experience আমরাই দিই</p>
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+                    <div className="be-why-grid">
                         {[
                             { icon: '⚡', title: 'দ্রুত ডেলিভারি', desc: 'মাত্র ৩০ মিনিটে আপনার দরজায় পৌঁছে যাবে।', tag: '⏱ ৩০ min গ্যারান্টি', accent: '#FF5C00', iconBg: '#FFF0E5', tagBg: '#FFF0E5', tagColor: '#FF5C00' },
                             { icon: '🍽️', title: 'সেরা মান', desc: 'সেরা রেস্টুরেন্ট থেকে তাজা ও সুস্বাদু খাবার।', tag: '✓ Quality নিশ্চিত', accent: '#1D9E75', iconBg: '#E1F5EE', tagBg: '#E1F5EE', tagColor: '#0F6E56' },
                             { icon: '💳', title: 'সহজ পেমেন্ট', desc: 'bKash, Card বা Cash on Delivery।', tag: '🔒 Secure Payment', accent: '#7F77DD', iconBg: '#EEEDFE', tagBg: '#EEEDFE', tagColor: '#534AB7' },
                         ].map(f => (
-                            <div key={f.title} className="bg-white rounded-3xl p-8 relative overflow-hidden text-left" style={{ border: '0.5px solid #f0e0d6' }}>
-                                <div className="absolute top-0 left-0 right-0 h-1 rounded-t-3xl" style={{ background: f.accent }} />
-                                <div className="flex items-center justify-center mb-5" style={{ width: 64, height: 64, borderRadius: 18, background: f.iconBg, fontSize: 30 }}>{f.icon}</div>
-                                <h3 className="text-lg font-bold text-gray-900 mb-2">{f.title}</h3>
-                                <p className="text-gray-400 text-sm leading-relaxed mb-5">{f.desc}</p>
-                                <span className="inline-block text-xs font-semibold px-3 py-1 rounded-full" style={{ background: f.tagBg, color: f.tagColor }}>{f.tag}</span>
+                            <div key={f.title} style={{ background: 'white', borderRadius: 24, padding: '32px', position: 'relative', overflow: 'hidden', border: '0.5px solid #f0e0d6' }}>
+                                <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 4, borderRadius: '24px 24px 0 0', background: f.accent }} />
+                                <div style={{ width: 64, height: 64, borderRadius: 18, background: f.iconBg, fontSize: 28, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 20 }}>{f.icon}</div>
+                                <h3 style={{ fontSize: 17, fontWeight: 700, color: '#1c1917', marginBottom: 8 }}>{f.title}</h3>
+                                <p style={{ color: '#a8a29e', fontSize: 14, lineHeight: 1.6, marginBottom: 20 }}>{f.desc}</p>
+                                <span style={{ display: 'inline-block', fontSize: 12, fontWeight: 600, padding: '4px 12px', borderRadius: 99, background: f.tagBg, color: f.tagColor }}>{f.tag}</span>
                             </div>
                         ))}
                     </div>
                 </div>
             </div>
 
+            {/* ── Footer ── */}
             <footer style={{ background: '#111111', color: '#aaa' }}>
-                <div className="max-w-6xl mx-auto px-6 py-14 grid grid-cols-1 md:grid-cols-4 gap-10">
-                    <div className="md:col-span-2">
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
-                            <span style={{ fontSize: 28 }}>🍔</span>
-                            <span style={{ fontSize: 24, fontWeight: 900, background: 'linear-gradient(90deg, #FF5C00, #FFD166)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>BanglaEats</span>
+                <div className="be-container">
+                    <div className="be-footer-grid">
+                        <div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
+                                <span style={{ fontSize: 28 }}>🍔</span>
+                                <span style={{ fontSize: 24, fontWeight: 900, background: 'linear-gradient(90deg, #FF5C00, #FFD166)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>BanglaEats</span>
+                            </div>
+                            <p style={{ fontSize: 14, lineHeight: 1.7, color: '#888', maxWidth: 300 }}>Dhaka-তে সবচেয়ে দ্রুত ও সেরা food delivery platform।</p>
                         </div>
-                        <p style={{ fontSize: 14, lineHeight: 1.7, color: '#888', maxWidth: 300, marginBottom: 20 }}>Dhaka-তে সবচেয়ে দ্রুত ও সেরা food delivery platform।</p>
-                    </div>
-                    <div>
-                        <div style={{ fontSize: 13, fontWeight: 700, color: '#fff', marginBottom: 16, textTransform: 'uppercase' }}>Quick Links</div>
-                        {['Menu', 'My Orders', 'Cart', 'Offers & Coupons'].map(l => (
-                            <div key={l} style={{ marginBottom: 10 }}>
-                                <span style={{ fontSize: 14, color: '#888', cursor: 'pointer' }}>{l}</span>
-                            </div>
-                        ))}
-                    </div>
-                    <div>
-                        <div style={{ fontSize: 13, fontWeight: 700, color: '#fff', marginBottom: 16, textTransform: 'uppercase' }}>Contact</div>
-                        {[{ icon: '📍', text: 'Dhaka, Bangladesh' }, { icon: '📞', text: '+880 1XXX-XXXXXX' }, { icon: '✉️', text: 'hello@banglaeats.com' }].map(c => (
-                            <div key={c.text} style={{ display: 'flex', gap: 8, marginBottom: 12 }}>
-                                <span>{c.icon}</span>
-                                <span style={{ fontSize: 13, color: '#777' }}>{c.text}</span>
-                            </div>
-                        ))}
+                        <div>
+                            <div style={{ fontSize: 12, fontWeight: 700, color: '#fff', marginBottom: 16, textTransform: 'uppercase', letterSpacing: '0.08em' }}>Quick Links</div>
+                            {['Menu', 'My Orders', 'Cart', 'Offers & Coupons'].map(l => (
+                                <div key={l} style={{ marginBottom: 10 }}>
+                                    <span style={{ fontSize: 14, color: '#888', cursor: 'pointer' }}>{l}</span>
+                                </div>
+                            ))}
+                        </div>
+                        <div>
+                            <div style={{ fontSize: 12, fontWeight: 700, color: '#fff', marginBottom: 16, textTransform: 'uppercase', letterSpacing: '0.08em' }}>Contact</div>
+                            {[{ icon: '📍', text: 'Dhaka, Bangladesh' }, { icon: '📞', text: '+880 1XXX-XXXXXX' }, { icon: '✉️', text: 'hello@banglaeats.com' }].map(c => (
+                                <div key={c.text} style={{ display: 'flex', gap: 8, marginBottom: 12 }}>
+                                    <span>{c.icon}</span>
+                                    <span style={{ fontSize: 13, color: '#777' }}>{c.text}</span>
+                                </div>
+                            ))}
+                        </div>
                     </div>
                 </div>
                 <div style={{ borderTop: '0.5px solid #222', padding: '20px 24px', textAlign: 'center' }}>
